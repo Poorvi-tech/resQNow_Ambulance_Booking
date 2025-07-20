@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Panel - ResQNow</title>
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f9f9f9;
+        color: #333;
+      }
+
+      header {
+        background-color: #fff;
+        padding: 20px 10%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #ddd;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        flex-wrap: wrap;
+      }
+
+      header h1 {
+        margin: 0;
+        color: #e60050;
+        font-size: 24px;
+      }
+
+      nav {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-top: 10px;
+      }
+
+      nav a {
+        text-decoration: none;
+        color: #555;
+        font-weight: bold;
+        font-size: 14px;
+      }
+
+      nav a:hover {
+        text-decoration: underline;
+      }
+
+      .container {
+        padding: 40px 10%;
+      }
+
+      h2 {
+        color: #e60050;
+        margin-bottom: 20px;
+        font-size: 22px;
+      }
+
+      .booking-entry {
+        background: #fff;
+        border: 1px solid #ccc;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      footer {
+        text-align: center;
+        padding: 20px 10%;
+        background-color: #f4f4f4;
+        border-top: 1px solid #ddd;
+        margin-top: 50px;
+        color: #777;
+        font-size: 13px;
+      }
+
+      /* Responsive Styles */
+      @media (max-width: 768px) {
+        header {
+          flex-direction: column;
+          align-items: flex-start;
+          padding: 20px;
+        }
+
+        header h1 {
+          font-size: 20px;
+        }
+
+        nav {
+          justify-content: flex-start;
+          margin-top: 10px;
+        }
+
+        .container {
+          padding: 20px;
+        }
+
+        h2 {
+          font-size: 18px;
+        }
+
+        .booking-entry {
+          font-size: 13px;
+          padding: 12px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        nav a {
+          font-size: 12px;
+          padding: 4px 8px;
+        }
+
+        footer {
+          font-size: 12px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>ResQNow Admin</h1>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="#" onclick="logout()">Logout</a>
+      </nav>
+    </header>
+
+    <div class="container">
+      <h2>📋 All Ambulance Bookings</h2>
+      <div id="admin-booking-data"></div>
+    </div>
+
+    <footer>
+      <p>&copy; 2025 ResQNow. All rights reserved.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+      const token = localStorage.getItem("token");
+      const role = localStorage.getItem("userRole");
+      const isLoggedIn = localStorage.getItem("loggedIn");
+
+      if (!isLoggedIn || !token || role !== "admin") {
+        alert("Access Denied. Admins only.");
+        window.location.href = "login.html";
+      }
+
+      const bookingContainer = document.getElementById("admin-booking-data");
+
+      async function fetchAdminBookings() {
+        try {
+          const response = await axios.get(
+            "https://resqnow-ambulance-booking.onrender.com/api/book/history",
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+
+          const bookings = response.data.data;
+
+          if (!bookings.length) {
+            bookingContainer.innerHTML = "<p>No bookings found.</p>";
+            return;
+          }
+
+          let html = "";
+          bookings.forEach((b) => {
+            html += `
+            <div class="booking-entry">
+              <p><strong>Patient Name:</strong> ${b.patientName}</p>
+              <p><strong>Pickup Location:</strong> ${b.pickupLocation}</p>
+              <p><strong>Hospital Destination:</strong> ${b.dropLocation}</p>
+              <p><strong>Contact Number:</strong> ${b.contactNumber}</p>
+              <p><strong>Emergency Type:</strong> ${b.emergency}</p>
+              <p><strong>Booking Date:</strong> ${new Date(
+                b.bookingDate
+              ).toLocaleString()}</p>
+              <p><strong>Booked By (User ID):</strong> ${b.userId}</p>
+            </div>
+          `;
+          });
+
+          bookingContainer.innerHTML = html;
+        } catch (error) {
+          console.error(error);
+          bookingContainer.innerHTML = "<p>Error loading bookings.</p>";
+        }
+      }
+
+      function logout() {
+        localStorage.clear();
+        alert("Logged out successfully.");
+        window.location.href = "login.html";
+      }
+
+      fetchAdminBookings();
+    </script>
+  </body>
+</html>

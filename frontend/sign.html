@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign Up - ResQNow</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: #f6f5f7;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #fff;
+      padding: 20px 10%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #ddd;
+    }
+
+    header h1 {
+      color: #e60050;
+      font-size: 24px;
+    }
+
+    .nav-right {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .nav-right a {
+      text-decoration: none;
+      font-weight: 600;
+      color: #e60050;
+    }
+
+    .signup-container {
+      display: flex;
+      margin: 40px auto;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      max-width: 900px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      width: 90%;
+    }
+
+    .left-panel {
+      background: linear-gradient(to bottom right, #a70606, #c962a3);
+      color: white;
+      flex: 1;
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .left-panel h2 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    .left-panel p {
+      font-size: 14px;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .left-panel button {
+      background: transparent;
+      border: 2px solid #fff;
+      color: #fff;
+      padding: 10px 30px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s ease;
+    }
+
+    .left-panel button:hover {
+      background: #fff;
+      color: #a70606;
+    }
+
+    .form-box {
+      flex: 1;
+      padding: 40px 30px;
+    }
+
+    .form-box h2 {
+      font-size: 22px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .social-icons {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .social-icons i {
+      margin: 0 10px;
+      cursor: pointer;
+      color: #555;
+    }
+
+    form input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      background: #eee;
+      border: none;
+      border-radius: 5px;
+    }
+
+    form button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      background: linear-gradient(to right, #c962a3, #a70606);
+      color: #fff;
+      border: none;
+      border-radius: 30px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    form button:hover {
+      opacity: 0.9;
+    }
+
+    footer {
+      background: #f1f1f1;
+      text-align: center;
+      padding: 15px;
+      margin-top: auto;
+      font-size: 14px;
+      color: #777;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .signup-container {
+        flex-direction: column;
+        width: 95%;
+      }
+
+      .left-panel, .form-box {
+        width: 100%;
+      }
+
+      .left-panel {
+        padding: 30px 15px;
+        text-align: center;
+      }
+
+      .form-box {
+        padding: 30px 20px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .form-box {
+        width: 90% !important;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      form input, form button {
+        font-size: 14px;
+      }
+
+      header h1 {
+        font-size: 18px;
+      }
+
+      .nav-right a {
+        font-size: 13px;
+      }
+    }
+.nav-left a {
+  text-decoration: none;
+}
+
+.nav-left h1 {
+  margin: 0;
+  font-size: 20px;
+  color: #e60050;
+  white-space: nowrap;
+  border-bottom: none; /* Ensure no underline */
+}
+
+
+  </style>
+</head>
+<body>
+  <header>
+     <div class="nav-left">
+       <a href="index.html"><h1> 🚑 ResQNow </h1></a>
+  </div>
+    <div class="nav-right">
+      <a href="index.html">Home</a>
+      
+    </div>
+  </header>
+
+  <div class="signup-container">
+    <div class="left-panel">
+      <h2>BOOK AN AMBULANCE</h2>
+      <p>To continue with us please login with your personal info</p>
+      <button onclick="window.location.href='login.html'">LOG IN</button>
+    </div>
+    <div class="form-box">
+      <h2>Create Account</h2>
+      <div class="social-icons">
+        <i class="fab fa-facebook-f"></i>
+        <i class="fab fa-google-plus-g"></i>
+        <i class="fab fa-linkedin-in"></i>
+      </div>
+      <form id="register-form">
+        <input type="text" id="register-name" placeholder="Name" required />
+        <input type="email" id="register-email" placeholder="Email" required />
+        <input type="text" id="register-mobile" placeholder="Mobile" required />
+        <input type="password" id="register-password" placeholder="Password" required />
+        <button type="submit">Sign Up</button>
+        <p id="registerMessage" style="margin-top: 10px; color: red;"></p>
+      </form>
+    </div>
+  </div>
+
+  <footer>© 2025 ResQNow. All rights reserved.</footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    document.getElementById("register-form").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const name = document.getElementById("register-name").value.trim();
+      const email = document.getElementById("register-email").value.trim();
+      const mobile = document.getElementById("register-mobile").value.trim();
+      const password = document.getElementById("register-password").value.trim();
+
+      try {
+        const res = await axios.post(
+          "https://resqnow-ambulance-booking.onrender.com/api/auth/register",
+          { name, email, mobile, password }
+        );
+        document.getElementById("registerMessage").innerText = res.data.msg;
+        alert("Account created. Please verify OTP.");
+        localStorage.setItem("tempEmail", email);
+        window.location.href = "otp.html";
+      } catch (err) {
+        document.getElementById("registerMessage").innerText =
+          err.response?.data?.msg || "Registration failed. Try again.";
+        if (err.response?.data?.msg.toLowerCase().includes("already")) {
+          if (confirm("User already exists. Do you want to login?")) {
+            window.location.href = "login.html";
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

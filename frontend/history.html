@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Booking History</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f7f8fc;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+
+      header {
+        background-color: #fff;
+        padding: 15px 10%;
+        border-bottom: 1px solid #ddd;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      }
+
+      header h1 {
+        color: #e60050;
+        font-size: 20px;
+        margin: 0;
+      }
+
+      nav a {
+        text-decoration: none;
+        color: #e60050;
+        font-weight: bold;
+        margin-left: 15px;
+        font-size: 14px;
+        border: 1px solid #e60050;
+        padding: 6px 12px;
+        border-radius: 20px;
+      }
+
+      nav a:hover {
+        background-color: #e60050;
+        color: #fff;
+      }
+
+      h2 {
+        text-align: center;
+        margin: 30px 0 20px;
+        color: #222;
+      }
+
+      #history {
+        max-width: 600px;
+        margin: 0 auto;
+        width: 100%;
+        flex: 1;
+        padding: 0 15px;
+      }
+
+      .booking {
+        border: 1px solid #ddd;
+        background-color: #fff;
+        margin-bottom: 15px;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+      }
+
+      .booking p {
+        margin: 6px 0;
+        font-size: 15px;
+      }
+
+      a.home-button {
+        display: block;
+        text-align: center;
+        margin: 20px auto;
+        text-decoration: none;
+        background-color: #e60050;
+        color: #fff;
+        padding: 12px 24px;
+        border-radius: 8px;
+        max-width: 200px;
+        width: 100%;
+      }
+
+      a.home-button:hover {
+        background-color: #c80045;
+      }
+
+      footer {
+        text-align: center;
+        padding: 15px;
+        background-color: #fff;
+        border-top: 1px solid #ddd;
+        font-size: 13px;
+        color: #666;
+      }
+
+      @media (max-width: 480px) {
+        header {
+          padding: 10px 5%;
+        }
+
+        header h1 {
+          font-size: 16px;
+        }
+
+        nav a {
+          margin-left: 8px;
+          font-size: 12px;
+          padding: 5px 10px;
+        }
+
+        .booking p {
+          font-size: 14px;
+        }
+
+        a.home-button {
+          padding: 10px 16px;
+          font-size: 14px;
+        }
+
+        footer {
+          font-size: 12px;
+        }
+      }
+
+      .nav-left a {
+  text-decoration: none;
+}
+
+.nav-left h1 {
+  margin: 0;
+  font-size: 20px;
+  color: #e60050;
+  white-space: nowrap;
+  border-bottom: none; /* Ensure no underline */
+}
+
+    </style>
+  </head>
+  <body>
+    <!-- ✅ Header Start -->
+    <header>
+    <div class="nav-left">
+       <a href="index.html"><h1> 🚑 ResQNow </h1></a>
+  </div>
+      <nav>
+         <a href="index.html">Home</a>
+        <a href="profile.html">Profile</a>
+      </nav>
+    </header>
+    <!-- ✅ Header End -->
+
+    <h2>🚑 My Booking History</h2>
+
+    <div id="history"></div>
+
+   
+
+    <!-- ✅ Footer Start -->
+    <footer>&copy; 2025 ResQNow. All rights reserved.</footer>
+    <!-- ✅ Footer End -->
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+      const token = localStorage.getItem("token");
+
+      async function loadHistory() {
+        try {
+          const res = await axios.get(
+            "https://resqnow-ambulance-booking.onrender.com/api/book/user-history",
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+
+          const historyDiv = document.getElementById("history");
+          const bookings = res.data.bookings;
+
+          if (bookings.length === 0) {
+            historyDiv.innerHTML = "<p>No bookings found.</p>";
+            return;
+          }
+
+          bookings.forEach((b) => {
+            const div = document.createElement("div");
+            div.className = "booking";
+            div.innerHTML = `
+            <p><strong>Pickup:</strong> ${b.pickup}</p>
+            <p><strong>Destination:</strong> ${b.destination}</p>
+            <p><strong>Date:</strong> ${new Date(
+              b.createdAt
+            ).toLocaleString()}</p>
+          `;
+            historyDiv.appendChild(div);
+          });
+        } catch (err) {
+          document.getElementById("history").innerText =
+            "Failed to load history";
+        }
+      }
+
+      loadHistory();
+    </script>
+  </body>
+</html>

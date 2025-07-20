@@ -1,0 +1,287 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>User Profile - ResQNow</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f7f8fc;
+      margin: 0;
+      color: #222;
+      overflow-x: hidden;
+    }header {
+  background-color: #fff;
+  padding: 20px 10%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  border-bottom: 1px solid #eee;
+}
+
+header h1 {
+  color: #e60050;
+  font-weight: 700;
+  font-size: 26px;
+  margin: 0;
+}
+
+nav {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+nav a {
+  text-decoration: none;
+  color: #333;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 6px 12px;
+  border-radius: 5px;
+}
+
+nav a:hover {
+  background: #ffe6ec;
+  color: #e60050;
+}
+
+.container {
+  padding: 40px 10%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.section {
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgba(0,0,0,0.05);
+  margin-bottom: 30px;
+}
+
+.section h2 {
+  color: #e60050;
+  margin-bottom: 15px;
+}
+
+.label {
+  font-weight: 600;
+  margin-top: 10px;
+  display: block;
+}
+
+input[type="file"], input[type="text"] {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+button {
+  background-color: #e60050;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s ease;
+}
+
+button:hover {
+  background-color: #c80045;
+}
+
+img.preview, img.profile-photo {
+  max-width: 100px;
+  border-radius: 50%;
+  margin-top: 10px;
+}
+
+footer {
+  background: #f4f4f4;
+  text-align: center;
+  padding: 20px 10%;
+  color: #555;
+  border-top: 1px solid #ddd;
+  font-size: 13px;
+}
+
+footer a {
+  color: #e60050;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+#deleteAccountBtn {
+  background-color: red;
+  margin-top: 20px;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .container {
+    padding: 20px 5%;
+  }
+
+  button, #deleteAccountBtn {
+    width: 100%;
+  }
+}
+
+.nav-left a {
+  text-decoration: none;
+}
+
+.nav-left h1 {
+  margin: 0;
+  font-size: 20px;
+  color: #e60050;
+  white-space: nowrap;
+  border-bottom: none;
+}
+
+  </style>
+</head>
+<body>
+  <header>
+      <div class="nav-left">
+        <a href="index.html"><h1>🚑 ResQNow</h1></a>
+      </div>
+    <nav>
+      <span id="auth-links"></span>
+    </nav>
+  </header>  <div class="container">
+    <div class="section" id="user-info"></div>
+    <div class="section" id="booking-history"></div>
+    <div class="section">
+      <h2>Edit Profile</h2>
+      <form id="profile-form" enctype="multipart/form-data">
+        <label class="label">Profile Picture:</label>
+        <input type="file" id="profilePhoto" accept="image/*" onchange="showPreview(event)" />
+        <img id="preview-img" class="preview" src="#" style="display:none;" /><label class="label">Name:</label>
+    <input type="text" id="edit-name" placeholder="Enter your name" value="">
+
+    <label class="label">Upload Aadhaar Card:</label>
+    <input type="file" id="aadhaarCard" name="aadhaarCard" accept=".pdf,.jpg,.jpeg,.png" />
+
+    <label class="label">Upload Medical Certificate:</label>
+    <input type="file" id="medicalCertificate" name="medicalCertificate" accept=".pdf,.jpg,.jpeg,.png" />
+
+    <button type="submit">Update Profile</button>
+  </form>
+</div>
+<button id="deleteAccountBtn">Delete My Account</button>
+
+  </div>  <footer>
+    <p>© 2025 Ambulance Booking. All rights reserved.</p>
+    <p><strong>Phone:</strong> 1800-234-001</p>
+    <p><strong>Email:</strong> <a href="mailto:support@resqnow.com">support@resqnow.com</a></p>
+  </footer>  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>  <script>
+    const userId = localStorage.getItem("userId");
+    const token = localStorage.getItem("token");
+
+    function logout() {
+      localStorage.clear();
+      alert("You have been logged out.");
+      window.location.href = "login.html";
+    }
+
+    const photoPath = localStorage.getItem("userPhoto") || '';
+    const profileImgTag = photoPath ? `<img src="https://resqnow-backend-lru3.onrender.com/${photoPath}" class="profile-photo">` : '';
+
+    document.getElementById("user-info").innerHTML = `
+      ${profileImgTag}
+      <p><b>Name:</b> ${localStorage.getItem("userName")}</p>
+      <p><b>Email:</b> ${localStorage.getItem("userEmail")}</p>
+      <p><b>Mobile:</b> ${localStorage.getItem("userPhone") || "Not available"}</p>
+    `;
+
+    document.getElementById("edit-name").value = localStorage.getItem("userName");
+
+    function showPreview(event) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const img = document.getElementById("preview-img");
+        img.src = reader.result;
+        img.style.display = "block";
+      };
+      reader.readAsDataURL(event.target.files[0]);
+    }
+
+    document.getElementById("profile-form").addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      try {
+        const name = document.getElementById("edit-name").value;
+        await axios.put('https://resqnow-ambulance-booking.onrender.com/api/auth/update-profile', { name }, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        localStorage.setItem("userName", name);
+
+        const photo = document.getElementById("profilePhoto").files[0];
+        if (photo) {
+          const form = new FormData();
+          form.append("photo", photo);
+          await axios.post('https://resqnow-ambulance-booking.onrender.com/api/upload/photo', form, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+        }
+
+        const aadhaar = document.getElementById("aadhaarCard").files[0];
+        if (aadhaar) {
+          const form = new FormData();
+          form.append("aadhaar", aadhaar);
+          await axios.post('https://resqnow-ambulance-booking.onrender.com/api/upload/aadhaar', form, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+        }
+
+        const medical = document.getElementById("medicalCertificate").files[0];
+        if (medical) {
+          const form = new FormData();
+          form.append("medicalCertificate", medical);
+          await axios.post('https://resqnow-ambulance-booking.onrender.com/api/upload/medical', form, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+        }
+
+        alert("Profile updated successfully!");
+        location.reload();
+      } catch (err) {
+        alert("Error: " + (err.response?.data?.msg || err.message));
+      }
+    });
+
+    const authLinks = document.getElementById("auth-links");
+    authLinks.innerHTML = token ? '<a href="#" onclick="logout()">Logout</a>' : '<a href="login.html">Login</a>';
+
+    document.getElementById('deleteAccountBtn').addEventListener('click', async () => {
+      if (confirm('Are you sure you want to delete your account? This action is irreversible.')) {
+        try {
+          await axios.delete('https://resqnow-ambulance-booking.onrender.com/api/auth/delete', {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+
+          alert('Account deleted successfully.');
+          localStorage.clear();
+          window.location.href = 'index.html';
+        } catch (err) {
+          alert('Failed to delete account. Please try again.');
+        }
+      }
+    });
+  </script></body>
+</html>

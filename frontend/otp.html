@@ -1,0 +1,222 @@
+<!DOCTYPE html><html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verify OTP - ResQNow</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
+    <style>
+      @import url("https://fonts.googleapis.com/css?family=Montserrat:400,700");* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: "Montserrat", sans-serif;
+    background: #f5f7fa;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  header {
+    background: #fff;
+    padding: 20px 10%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  header h1 {
+    color: #e60050;
+    font-size: 24px;
+    font-weight: 700;
+  }
+
+  nav {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+  }
+
+  nav a {
+    text-decoration: none;
+    color: #222;
+    font-weight: 600;
+    font-size: 14px;
+    transition: 0.3s;
+  }
+
+  nav a:hover {
+    color: #e60050;
+  }
+
+  .main-content {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+  }
+
+  .otp-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 40px 30px;
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    position: relative;
+  }
+
+  .otp-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 8px;
+    width: 100%;
+    background: linear-gradient(to right, #c962a3, #a70606);
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+  }
+
+  .otp-card h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: #333;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    font-size: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+
+  button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    background: linear-gradient(to right, #c962a3, #a70606);
+    color: white;
+    font-size: 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  button:hover {
+    opacity: 0.9;
+  }
+
+  #message {
+    margin-top: 15px;
+    font-size: 14px;
+    color: green;
+  }
+
+  .otp-card a {
+    margin-top: 15px;
+    display: inline-block;
+    font-size: 13px;
+    color: #a70606;
+    text-decoration: underline;
+  }
+
+  footer {
+    background: #f4f4f4;
+    text-align: center;
+    padding: 20px 10%;
+    font-size: 13px;
+    color: #555;
+    border-top: 1px solid #ddd;
+  }
+
+  footer a {
+    color: #e60050;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  @media (max-width: 600px) {
+    header, footer {
+      padding: 15px 5%;
+    }
+
+    .otp-card {
+      padding: 30px 20px;
+    }
+  }
+</style>
+
+  </head>
+  <body>
+    <header>
+      <h1>ResQNow</h1>
+      <nav>
+        <a href="index.html">Home</a>
+        <a class="phone-number" href="tel:1800234001">📞 1800-234-001</a>
+      </nav>
+    </header><div class="main-content">
+  <div class="otp-card">
+    <h2>Enter OTP sent to your Email</h2>
+    <form id="otpform" onsubmit="event.preventDefault(); verifyOTP();">
+      <input type="text" id="otp" placeholder="Enter OTP" required />
+      <button type="submit">Verify</button>
+      <p id="message"></p>
+    </form>
+    <a href="resend-otp.html">Resend OTP</a>
+  </div>
+</div>
+
+<footer>
+  <p>© 2025 Ambulance Booking. All rights reserved.</p>
+  <p><strong>Phone:</strong> 1800-234-001</p>
+  <p>
+    <strong>Email:</strong>
+    <a href="mailto:support@resqnow.com">support@resqnow.com</a>
+  </p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+  async function verifyOTP() {
+    const email = localStorage.getItem("tempEmail");
+    const otp = document.getElementById("otp").value;
+
+    try {
+      const response = await axios.post(
+        "https://resqnow-ambulance-booking.onrender.com/api/auth/verify-otp",
+        { email, otp }
+      );
+
+      document.getElementById("message").innerText =
+        response.data.msg || "OTP Verified Successfully";
+
+      if (response.data.token) {
+        localStorage.setItem("token", response.data.token);
+      }
+
+      localStorage.removeItem("tempEmail");
+
+      setTimeout(() => {
+        window.location.href = "login.html";
+      }, 2000);
+    } catch (err) {
+      const errorMessage = err.response?.data?.msg || "Verification failed";
+      document.getElementById("message").innerText =
+        errorMessage.includes("otp") || errorMessage.includes("invalid")
+          ? "Invalid OTP. Please try again."
+          : "Invalid OTP. Please try again.";
+    }
+  }
+</script>
+
+  </body>
+</html>

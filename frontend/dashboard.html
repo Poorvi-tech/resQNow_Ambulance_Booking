@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard | ResQNow</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f8f9fa;
+        color: #333;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      header {
+        background: #fff;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 5%;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        position: relative;
+        z-index: 1000;
+      }
+      .nav-left a {
+        text-decoration: none;
+      }
+      .nav-left h1 {
+        margin: 0;
+        font-size: 22px;
+        color: #e60050;
+        white-space: nowrap;
+      }
+      .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 25px;
+      }
+      .nav-right a {
+        text-decoration: none;
+        color: #333;
+        font-weight: 500;
+        font-size: 16px;
+      }
+      .nav-right a:hover {
+        color: #e60050;
+      }
+      .profile-dropdown {
+        position: relative;
+      }
+      .profile-btn {
+        background: none;
+        border: none;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .dropdown-menu {
+        display: none;
+        position: absolute;
+        right: 0;
+        top: 45px;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        min-width: 180px;
+        z-index: 100;
+        overflow: hidden;
+      }
+      .dropdown-menu.show {
+        display: block;
+      }
+      .dropdown-menu a {
+        display: block;
+        padding: 12px 18px;
+        color: #333;
+        text-decoration: none;
+      }
+      .dropdown-menu a:hover {
+        background-color: #f5f5f5;
+      }
+      .hamburger {
+        display: none;
+        font-size: 24px;
+        cursor: pointer;
+        background: none;
+        border: none;
+      }
+      main {
+        flex: 1;
+        padding: 40px 5%;
+        max-width: 900px;
+        width: 100%;
+        margin: 20px auto;
+      }
+      .dashboard-card {
+        background: #fff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      }
+      h2 {
+        color: #e60050;
+        font-size: 28px;
+        margin-bottom: 20px;
+      }
+      .dashboard-card p {
+        font-size: 18px;
+        color: #444;
+        margin-bottom: 15px;
+        line-height: 1.6;
+      }
+      footer {
+        text-align: center;
+        background: #f4f4f4;
+        padding: 20px;
+        font-size: 14px;
+        color: #555;
+        margin-top: auto;
+      }
+      @media (max-width: 768px) {
+        .nav-right {
+          display: none;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 0;
+          position: absolute;
+          top: 100%;
+          left: 0;
+          width: 100%;
+          background: white;
+          padding: 10px 0;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .nav-right.show {
+          display: flex;
+        }
+        .nav-right a, .profile-btn {
+          padding: 15px 5%;
+          width: 100%;
+          text-align: left;
+        }
+        .dropdown-menu {
+            position: static;
+            border: none;
+            box-shadow: none;
+            background: #f9f9f9;
+        }
+        .dropdown-menu a {
+            padding-left: 10%;
+        }
+        .hamburger {
+          display: block;
+        }
+      }
+    </style>
+</head>
+<body>
+    <header>
+      <div class="nav-left">
+        <a href="index.html"><h1>🚑 ResQNow</h1></a>
+      </div>
+      <nav class="nav-right" id="navLinks">
+        <a href="index.html">Home</a>
+        <div class="profile-dropdown">
+          <button class="profile-btn" onclick="toggleDropdown(event)">
+            <i class="fas fa-user-circle"></i> <span id="profileName">Profile</span> <i class="fas fa-caret-down"></i>
+          </button>
+          <div class="dropdown-menu" id="dropdownMenu">
+            <a href="profile.html"><i class="fas fa-user-edit"></i> View Profile</a>
+            <a href="reset-password.html"><i class="fas fa-key"></i> Reset Password</a>
+            <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+          </div>
+        </div>
+      </nav>
+      <button class="hamburger" onclick="toggleMenu()">
+        <i class="fas fa-bars"></i>
+      </button>
+    </header>
+
+    <main>
+      <div class="dashboard-card">
+        <h2 id="userGreeting">Welcome to Your Dashboard</h2>
+        <p id="userEmail">📧 Email: loading...</p>
+        <p id="userMobile">📱 Mobile: loading...</p>
+        <p id="userId">🆔 User ID: loading...</p>
+      </div>
+    </main>
+
+    <footer>
+      <p>© 2025 ResQNow. All rights reserved.</p>
+      <p><strong>Email:</strong> support@resqnow.com</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        fetchUserProfile();
+        const userName = localStorage.getItem("userName");
+        if (userName) {
+            document.getElementById("profileName").innerText = userName;
+        }
+      });
+
+      function toggleMenu() {
+        document.getElementById("navLinks").classList.toggle("show");
+      }
+
+      function toggleDropdown(event) {
+        event.stopPropagation(); // Prevent window.onclick from closing it immediately
+        document.getElementById("dropdownMenu").classList.toggle("show");
+      }
+
+      // Close dropdown if clicked outside
+      window.onclick = function (event) {
+        const dropdownMenu = document.getElementById("dropdownMenu");
+        const profileBtn = document.querySelector(".profile-btn");
+        if (!profileBtn.contains(event.target) && dropdownMenu.classList.contains("show")) {
+          dropdownMenu.classList.remove("show");
+        }
+      }
+
+      async function fetchUserProfile() {
+        const token = localStorage.getItem("token");
+        const isLoggedIn = localStorage.getItem("loggedIn");
+
+        if (!isLoggedIn || !token) {
+          alert("Your session has expired. Please log in again.");
+          window.location.href = "login.html";
+          return;
+        }
+
+        try {
+          const response = await axios.get("https://resqnow-ambulance-booking.onrender.com/api/auth/profile", {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          const user = response.data.user;
+          document.getElementById("userGreeting").innerText = `Hello, ${user.name || "User"}!`;
+          document.getElementById("userEmail").innerText = `📧 Email: ${user.email || "Not provided"}`;
+          document.getElementById("userMobile").innerText = `📱 Mobile: ${user.mobile || "Not provided"}`;
+          document.getElementById("userId").innerText = `🆔 User ID: ${user._id || "N/A"}`;
+        } catch (err) {
+          console.error("Failed to load user profile:", err);
+          alert(err.response?.data?.msg || "Failed to load user profile. Please try logging in again.");
+          logout(); // Log out if the token is invalid or expired
+        }
+      }
+
+      function logout() {
+        localStorage.clear();
+        window.location.href = "index.html";
+      }
+    </script>
+</body>
+</html>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login - ResQNow</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"/>
+  <style>
+    @import url("https://fonts.googleapis.com/css?family=Montserrat:400,800");
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: #f6f5f7;
+      font-family: "Montserrat", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header, footer {
+      background: #fff;
+      padding: 20px 10%;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    header h1, footer p {
+      color: #e60050;
+      font-weight: bold;
+      font-size: 20px;
+    }
+    nav.nav-right {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+    nav.nav-right a {
+      color: #e60050;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 8px 16px;
+      border: 2px solid #e60050;
+      border-radius: 20px;
+      transition: 0.3s ease;
+    }
+    nav.nav-right a:hover {
+      background: #e60050;
+      color: #fff;
+    }
+    .container {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 14px 28px rgba(0,0,0,0.25),
+                  0 10px 10px rgba(0,0,0,0.22);
+      overflow: hidden;
+      width: 768px;
+      max-width: 100%;
+      min-height: 480px;
+      margin: 40px auto;
+      display: flex;
+      position: relative;
+    }
+    .form-container {
+      width: 50%;
+      padding: 50px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .overlay-container {
+      width: 50%;
+      background: linear-gradient(to right, #c962a3, #a70606);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+    }
+    form {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    input {
+      background: #eee;
+      border: none;
+      padding: 12px 15px;
+      margin: 8px 0;
+      width: 100%;
+      border-radius: 5px;
+    }
+    button {
+      border-radius: 20px;
+      border: 1px solid #ff1a1a;
+      background: linear-gradient(to right, #c962a3, #a70606);
+      color: #fff;
+      font-size: 12px;
+      font-weight: bold;
+      padding: 12px 45px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .overlay-container h1 {
+      margin-bottom: 10px;
+    }
+    .overlay-container p {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .overlay-container a {
+      color: #fff;
+      text-decoration: underline;
+      font-weight: bold;
+    }
+    footer {
+      margin-top: auto;
+      text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+        width: 90%;
+      }
+      .form-container, .overlay-container {
+        width: 100%;
+        padding: 30px;
+      }
+    }
+
+.nav-left a {
+  text-decoration: none;
+}
+
+.nav-left h1 {
+  margin: 0;
+  font-size: 20px;
+  color: #e60050;
+  white-space: nowrap;
+  border-bottom: none; /* Ensure no underline */
+}
+
+
+  </style>
+</head>
+<body>
+  <header>
+    <div class="nav-left">
+       <a href="index.html"><h1> 🚑 ResQNow </h1></a>
+  </div>
+    <nav class="nav-right">
+      <a href="index.html">Home</a>
+     
+    </nav>
+  </header>
+
+  <div class="container">
+    <!-- Login Form -->
+    <div class="form-container">
+      <form id="login-form">
+        <h1>Log In</h1>
+        <input type="email" id="login-email" placeholder="Email" required />
+        <input type="password" id="login-password" placeholder="Password" required />
+        <button type="submit">Login</button>
+        <p><a href="forgot-password.html">Forgot Password?</a></p>
+        <p id="loginMessage"></p>
+      </form>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay-container">
+      <h1>New Here?</h1>
+      <p>Create an account to book ambulance instantly.</p>
+      <a href="sign.html">Go to Sign Up →</a>
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2025 ResQNow. All rights reserved.</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    document.getElementById("login-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("login-email").value.trim();
+      const password = document.getElementById("login-password").value.trim();
+
+      try {
+        const res = await axios.post("https://resqnow-ambulance-booking.onrender.com/api/auth/login", { email, password });
+        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("loggedIn", "true");
+        localStorage.setItem("userName", res.data.user.name);
+        localStorage.setItem("userRole", res.data.user.role);
+        localStorage.setItem("userId", res.data.user.id);
+        localStorage.setItem("userEmail", res.data.user.email);
+        localStorage.setItem("userPhone", res.data.user.mobile);
+        alert("Login successful");
+        window.location.href = res.data.user.role === "admin" ? "sample.html" : "index.html";
+      } catch (err) {
+        const message = err.response?.data?.msg || "Login failed. Please try again.";
+        if (message.toLowerCase().includes("no account")) {
+          alert("No account found. Please sign up.");
+          window.location.href = "sign.html";
+        } else {
+          alert(message);
+        }
+        document.getElementById("loginMessage").innerText = message;
+      }
+    });
+  </script>
+</body>
+</html>

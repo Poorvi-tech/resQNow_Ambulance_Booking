@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Book Ambulance | ResQNow</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f7f8fc;
+      color: #222;
+    }
+
+    .navbar {
+      background-color: #fff;
+      padding: 20px 10%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #ddd;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .navbar h1 {
+      color: #e60050;
+      font-size: 24px;
+    }
+
+    .navbar a {
+      text-decoration: none;
+      background: #f2f2f2;
+      color: #333;
+      padding: 8px 16px;
+      border-radius: 6px;
+      margin-left: 12px;
+      font-weight: 500;
+    }
+
+    .navbar a:hover {
+      background: #ddd;
+      transform: scale(1.05);
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 14px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.08);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 24px;
+      color: #e60050;
+    }
+
+    label {
+      display: block;
+      margin-top: 18px;
+      font-weight: 600;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 15px;
+      background-color: #fefefe;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    .button-group {
+      margin-top: 30px;
+      text-align: center;
+    }
+
+    .btn-submit {
+      background-color: #e60050;
+      color: white;
+      padding: 14px 30px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .btn-submit:hover {
+      background-color: #c80045;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 13px;
+      padding: 20px 10px;
+      color: #555;
+      border-top: 1px solid #ddd;
+      background-color: #f4f4f4;
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 15px 5%;
+      }
+
+      .navbar a {
+        margin-left: 0;
+        margin-top: 8px;
+      }
+
+      .container {
+        margin: 20px;
+        padding: 20px;
+      }
+
+      .btn-submit {
+        width: 100%;
+      }
+    }
+    @media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: center;
+    padding: 15px 5%;
+  }
+
+  .navbar h1 {
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+
+  .navbar div {
+    width: 100%;
+    text-align: center;
+  }
+
+  .navbar a {
+    margin-left: 0;
+    margin-top: 6px;
+    display: inline-block;
+  }
+}
+
+  header h1 {
+      color: #e60050;
+      font-weight: bold;
+      font-size: 20px;
+    }
+
+     header, footer {
+      background: #fff;
+      padding: 20px 10%;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .nav-left a {
+  text-decoration: none;
+}
+
+.nav-left h1 {
+  margin: 0;
+  font-size: 20px;
+  color: #e60050;
+  white-space: nowrap;
+  border-bottom: none; /* Ensure no underline */
+}
+
+
+nav.nav-right {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+    nav.nav-right a {
+      color: #e60050;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 8px 16px;
+      border: 2px solid #e60050;
+      border-radius: 20px;
+      transition: 0.3s ease;
+    }
+    nav.nav-right a:hover {
+      background: #e60050;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+<header class="reveal">
+    <div class="nav-left">
+       <a href="index.html"><h1> 🚑 ResQNow </h1></a>
+  </div>
+  <nav class="nav-right">
+      <a href="index.html">Home</a>
+     
+    </nav>
+  </header>
+
+  <div class="container">
+    <h2>Book an Ambulance</h2>
+    <form id="bookingForm">
+      <label for="userId">Your User ID *</label>
+      <input type="text" id="userId" name="userId" required placeholder="Enter your User ID" />
+
+      <label for="name">Patient's Full Name *</label>
+      <input type="text" id="name" name="name" required />
+
+      <label for="location">Pickup Location *</label>
+      <input type="text" id="location" name="location" required />
+
+      <label for="destination">Hospital Destination *</label>
+      <select id="destination" name="destination" required>
+        <option value="">-- Select Hospital --</option>
+        <option value="aiims_delhi">AIIMS (New Delhi)</option>
+        <option value="apollo_chennai">Apollo Hospital (Chennai)</option>
+        <option value="fortis_mumbai">Fortis Hospital (Mumbai)</option>
+        <option value="medanta_gurugram">Medanta - The Medicity (Gurugram)</option>
+        <option value="max_saket">Max Super Speciality Hospital (Delhi)</option>
+        <option value="narayana_bengaluru">Narayana Health (Bengaluru)</option>
+        <option value="cmc_vellore">Christian Medical College (Vellore)</option>
+        <option value="kims_hyderabad">KIMS Hospital (Hyderabad)</option>
+        <option value="lilavati_mumbai">Lilavati Hospital (Mumbai)</option>
+        <option value="tata_mumbai">Tata Memorial Hospital (Mumbai)</option>
+      </select>
+
+      <label for="phone">Phone Number *</label>
+      <input type="tel" id="phone" name="phone" required pattern="[0-9]{10}" placeholder="10-digit number" />
+
+      <label for="emergency">Type of Emergency *</label>
+      <select id="emergency" name="emergency" required>
+        <option value="">-- Select Emergency Type --</option>
+        <option value="accident">Accident</option>
+        <option value="cardiac">Cardiac</option>
+        <option value="pregnancy">Pregnancy</option>
+        <option value="covid">COVID-19</option>
+        <option value="general">General Medical</option>
+        <option value="neuro">Neurology</option>
+        <option value="ortho">Orthology</option>
+        <option value="pediatrics">Pediatrics</option>
+        <option value="dermatology">Dermatology</option>
+        <option value="psychiatry">Psychiatry</option>
+        <option value="icu">ICU</option>
+      </select>
+
+      <label for="notes">Additional Notes</label>
+      <textarea id="notes" name="notes" rows="3" placeholder="Anything else we should know?"></textarea>
+
+      <div class="button-group">
+        <button type="submit" class="btn-submit">Submit Booking</button>
+      </div>
+    </form>
+  </div>
+
+  <footer>
+    <p>© 2025 ResQNow. All rights reserved.</p>
+  </footer>
+
+  <script>
+    document.getElementById("bookingForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const token = localStorage.getItem("token");
+      const userId = document.getElementById("userId").value.trim();
+
+      if (!userId || !token) {
+        alert("Please login and enter your User ID.");
+        return;
+      }
+
+      const patientName = document.getElementById("name").value.trim();
+      const pickupLocation = document.getElementById("location").value.trim();
+      const dropLocation = document.getElementById("destination").value.trim();
+      const contactNumber = document.getElementById("phone").value.trim();
+      const emergency = document.getElementById("emergency").value.trim();
+      const notes = document.getElementById("notes").value.trim();
+      const bookingDate = new Date().toISOString();
+
+      const bookingData = {
+        userId,
+        patientName,
+        pickupLocation,
+        dropLocation,
+        contactNumber,
+        bookingDate,
+        emergency,
+        notes,
+      };
+
+      try {
+        const response = await axios.post(
+          "https://resqnow-ambulance-booking.onrender.com/api/book/create",
+          bookingData,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        alert("Booking successful!");
+        window.location.href = "success.html";
+      } catch (error) {
+        alert(error.response?.data?.msg || "Booking failed. Try again.");
+      }
+    });
+  </script>
+</body>
+</html>
