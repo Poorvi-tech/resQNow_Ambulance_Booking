@@ -6,7 +6,7 @@ ResQNow is a full-stack web application that allows users to book ambulances onl
 
 ##  Live Project Link
 
-- 🔗 *Website link:* (https://resqnow.netlify.app/)
+- 🔗 *Website link:* (https://resqnoww.netlify.app/)
   
 ---
 
