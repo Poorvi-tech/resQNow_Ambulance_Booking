@@ -60,6 +60,8 @@ header {
   font-weight: 500;
   white-space: nowrap;
   font-size: 14px;
+  cursor: pointer;
+  border: none;
 }
 
 .nav-right a:hover {
@@ -95,10 +97,15 @@ header {
   padding: 12px 28px;
   text-decoration: none;
   display: block;
+  transition: background-color 0.3s ease;
 }
 
 .dropdown-content a:hover {
   background-color: #f1f1f1;
+}
+
+.dropdown-btn:hover {
+  background-color: #f4f4f4;
 }
 
 /* Mobile Fix: Keep header in one line */
@@ -448,10 +455,24 @@ footer {
     <nav class="nav-right" id="mainMenu">
       <a href="#about">About Us</a>
       <a href="#services">Services</a>
-      <a href="#why">Why Us?</a>
-      <a href="#faq">FAQs</a>
-      <a href="#contact">Contact</a>
-      <a href="sample.html" id="adminPanelLink" style="display:none;">Admin Panel</a>
+      <div class="dropdown">
+        <button class="dropdown-btn" onclick="toggleDropdownMenu(event)">More ▼</button>
+        <div class="dropdown-content">
+          <a href="#why">Why Us?</a>
+          <a href="#faq">FAQs</a>
+          <a href="#contact">Contact</a>
+          <a href="sample.html" id="adminPanelLink" style="display:none;">Admin Panel</a>
+          <a href="medical-assistant.html">Medical Assistant</a>
+          <a href="hospital-finder.html">Hospital Finder</a>
+          <a href="health-check.html">🔧 Backend Health Check</a>
+          <a href="#" id="emergencySimulator">🚑 Emergency Simulator</a>
+          <a href="#" id="healthTips">💡 Health Tips</a>
+          <a href="#" id="firstAid">🩹 First Aid Guide</a>
+          <a href="#" id="responseTime">⏱️ Live Response Tracker</a>
+          <a href="#" id="ambulanceGame">🎮 Ambulance Challenge</a>
+          <a href="#" id="medicalQuiz">🧠 Medical Quiz</a>
+        </div>
+      </div>
       <span class="phone-number">📞 1800-234-001</span>
       <span id="auth-links" style="position: relative;"></span>
     </nav>
@@ -583,6 +604,26 @@ function toggleMenu() {
   const menu = document.getElementById('mainMenu');
   menu.classList.toggle('show');
 }
+
+// Toggle dropdown menu
+function toggleDropdownMenu(event) {
+  event.stopPropagation();
+  const dropdown = event.target.nextElementSibling;
+  const isVisible = dropdown.style.display === 'block';
+  
+  // Close all dropdowns first
+  document.querySelectorAll('.dropdown-content').forEach(d => d.style.display = 'none');
+  
+  // Toggle current dropdown
+  dropdown.style.display = isVisible ? 'none' : 'block';
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', function() {
+  document.querySelectorAll('.dropdown-content').forEach(dropdown => {
+    dropdown.style.display = 'none';
+  });
+});
 
 // Prevent hamburger toggle from closing instantly
 document.querySelector('.hamburger').addEventListener('click', function(event) {
