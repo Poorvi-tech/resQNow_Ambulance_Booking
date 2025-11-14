@@ -5,59 +5,218 @@
     margin: 0;
     padding: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 18px;
 }
 
 body {
-    background: linear-gradient(to right, #00b4db, #0083b0);
-    height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
+    animation: gradientBG 15s ease infinite;
+    background-size: 400% 400%;
+    position: relative;
+    overflow: hidden;
+    font-size: 18px;
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Bubbles animation */
+.bubbles {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+    top: 0;
+    left: 0;
+}
+
+.bubble {
+    position: absolute;
+    bottom: -100px;
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    opacity: 0.5;
+    animation: rise 10s infinite ease-in;
+}
+
+.bubble:nth-child(1) {
+    width: 80px;
+    height: 80px;
+    left: 10%;
+    animation-duration: 8s;
+    background: rgba(255, 107, 107, 0.3);
+}
+
+.bubble:nth-child(2) {
+    width: 60px;
+    height: 60px;
+    left: 20%;
+    animation-duration: 5s;
+    animation-delay: 1s;
+    background: rgba(173, 216, 230, 0.3);
+}
+
+.bubble:nth-child(3) {
+    width: 100px;
+    height: 100px;
+    left: 35%;
+    animation-duration: 7s;
+    animation-delay: 2s;
+    background: rgba(144, 238, 144, 0.3);
+}
+
+.bubble:nth-child(4) {
+    width: 150px;
+    height: 150px;
+    left: 50%;
+    animation-duration: 11s;
+    animation-delay: 0s;
+    background: rgba(255, 182, 193, 0.3);
+}
+
+.bubble:nth-child(5) {
+    width: 70px;
+    height: 70px;
+    left: 55%;
+    animation-duration: 6s;
+    animation-delay: 1s;
+    background: rgba(255, 255, 0, 0.3);
+}
+
+.bubble:nth-child(6) {
+    width: 90px;
+    height: 90px;
+    left: 65%;
+    animation-duration: 8s;
+    background: rgba(153, 50, 204, 0.3);
+}
+
+.bubble:nth-child(7) {
+    width: 70px;
+    height: 70px;
+    left: 75%;
+    animation-duration: 7s;
+    animation-delay: 3s;
+    background: rgba(255, 165, 0, 0.3);
+}
+
+.bubble:nth-child(8) {
+    width: 130px;
+    height: 130px;
+    left: 80%;
+    animation-duration: 12s;
+    animation-delay: 2s;
+    background: rgba(0, 255, 255, 0.3);
+}
+
+.bubble:nth-child(9) {
+    width: 50px;
+    height: 50px;
+    left: 70%;
+    animation-duration: 5s;
+    animation-delay: 1s;
+    background: rgba(255, 192, 203, 0.3);
+}
+
+.bubble:nth-child(10) {
+    width: 100px;
+    height: 100px;
+    left: 85%;
+    animation-duration: 9s;
+    animation-delay: 4s;
+    background: rgba(124, 252, 0, 0.3);
+}
+
+@keyframes rise {
+    0% {
+        bottom: -100px;
+        transform: translateX(0);
+    }
+    50% {
+        transform: translateX(100px);
+    }
+    100% {
+        bottom: 1080px;
+        transform: translateX(-200px);
+    }
 }
 
 .container {
-    background-color: #ffffff;
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.9);
+    padding: 50px;
+    border-radius: 15px;
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
     width: 100%;
-    max-width: 400px;
+    max-width: 500px;
     text-align: center;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 h2 {
-    margin-bottom: 20px;
-    color: #333;
+    margin-bottom: 25px;
+    color: #ff6b6b;
+    font-size: 36px;
 }
 
 form input {
     width: 100%;
-    padding: 12px 15px;
-    margin: 10px 0;
+    padding: 18px 24px;
+    margin: 20px 0;
     border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 16px;
-    transition: 0.3s ease;
+    border-radius: 12px;
+    font-size: 20px;
+    transition: all 0.3s ease;
+    background-color: #fefefe;
 }
 
 form input:focus {
-    border-color: #0083b0;
     outline: none;
-    box-shadow: 0 0 5px rgba(0, 131, 176, 0.5);
+    border-color: #ff6b6b;
+    box-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
 }
 
 button {
     width: 100%;
-    padding: 12px;
-    background-color: #0083b0;
+    padding: 18px;
+    background: linear-gradient(135deg, #ff6b6b, #ff8e53);
     color: white;
-    font-size: 16px;
+    font-size: 22px;
+    font-weight: bold;
     border: none;
-    border-radius: 8px;
+    border-radius: 14px;
     cursor: pointer;
-    transition: background 0.3s ease;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
 }
 
 button:hover {
-    background-color: #005f7f;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+    background: linear-gradient(135deg, #ff8e53, #ff6b6b);
+}
+
+button:active {
+    transform: translateY(1px);
+}
+
+/* Pulsing animation for important elements */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.pulse {
+    animation: pulse 2s infinite;
 }

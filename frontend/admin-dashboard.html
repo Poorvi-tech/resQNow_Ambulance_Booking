@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard | ResQNow</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="js/config.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #222;
+      animation: gradientBG 15s ease infinite;
+      background-size: 400% 400%;
+      min-height: 100vh;
+      position: relative;
+      overflow-y: auto;
+      font-size: 18px;
+    }
+    
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    /* Bubbles animation */
+    .bubbles {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+      top: 0;
+      left: 0;
+    }
+    
+    .bubble {
+      position: absolute;
+      bottom: -100px;
+      width: 80px;
+      height: 80px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      opacity: 0.5;
+      animation: rise 10s infinite ease-in;
+    }
+    
+    .bubble:nth-child(1) {
+      width: 80px;
+      height: 80px;
+      left: 10%;
+      animation-duration: 8s;
+      background: rgba(255, 107, 107, 0.3);
+    }
+    
+    .bubble:nth-child(2) {
+      width: 60px;
+      height: 60px;
+      left: 20%;
+      animation-duration: 5s;
+      animation-delay: 1s;
+      background: rgba(173, 216, 230, 0.3);
+    }
+    
+    .bubble:nth-child(3) {
+      width: 100px;
+      height: 100px;
+      left: 35%;
+      animation-duration: 7s;
+      animation-delay: 2s;
+      background: rgba(144, 238, 144, 0.3);
+    }
+    
+    .bubble:nth-child(4) {
+      width: 150px;
+      height: 150px;
+      left: 50%;
+      animation-duration: 11s;
+      animation-delay: 0s;
+      background: rgba(255, 182, 193, 0.3);
+    }
+    
+    .bubble:nth-child(5) {
+      width: 70px;
+      height: 70px;
+      left: 55%;
+      animation-duration: 6s;
+      animation-delay: 1s;
+      background: rgba(255, 255, 0, 0.3);
+    }
+    
+    .bubble:nth-child(6) {
+      width: 90px;
+      height: 90px;
+      left: 65%;
+      animation-duration: 8s;
+      background: rgba(153, 50, 204, 0.3);
+    }
+    
+    .bubble:nth-child(7) {
+      width: 70px;
+      height: 70px;
+      left: 75%;
+      animation-duration: 7s;
+      animation-delay: 3s;
+      background: rgba(255, 165, 0, 0.3);
+    }
+    
+    .bubble:nth-child(8) {
+      width: 130px;
+      height: 130px;
+      left: 80%;
+      animation-duration: 12s;
+      animation-delay: 2s;
+      background: rgba(0, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(9) {
+      width: 50px;
+      height: 50px;
+      left: 70%;
+      animation-duration: 5s;
+      animation-delay: 1s;
+      background: rgba(255, 192, 203, 0.3);
+    }
+    
+    .bubble:nth-child(10) {
+      width: 100px;
+      height: 100px;
+      left: 85%;
+      animation-duration: 9s;
+      animation-delay: 4s;
+      background: rgba(124, 252, 0, 0.3);
+    }
+    
+    @keyframes rise {
+      0% {
+        bottom: -100px;
+        transform: translateX(0);
+      }
+      50% {
+        transform: translateX(100px);
+      }
+      100% {
+        bottom: 1080px;
+        transform: translateX(-200px);
+      }
+    }
+
+    .navbar {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 25px 12%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      position: relative;
+      z-index: 100;
+    }
+
+    .navbar h1 {
+      color: #fff;
+      font-size: 36px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .navbar a {
+      text-decoration: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      padding: 15px 24px;
+      border-radius: 10px;
+      margin-left: 20px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(5px);
+      font-size: 20px;
+    }
+
+    .navbar a:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.05);
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    .dashboard-header {
+      text-align: center;
+      color: white;
+      margin-bottom: 30px;
+    }
+
+    .dashboard-header h2 {
+      font-size: 36px;
+      margin-bottom: 10px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+      margin-bottom: 40px;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      padding: 30px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .stat-card h3 {
+      color: #555;
+      margin-bottom: 15px;
+      font-size: 22px;
+    }
+
+    .stat-value {
+      font-size: 42px;
+      font-weight: bold;
+      color: #ff6b6b;
+      margin: 10px 0;
+    }
+
+    .stat-change {
+      font-size: 16px;
+      color: #28a745;
+    }
+
+    .stat-change.negative {
+      color: #dc3545;
+    }
+
+    .charts-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+
+    .chart-container {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .chart-container h3 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+
+    .bookings-section {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      margin-bottom: 40px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    .section-header h3 {
+      color: #333;
+      font-size: 24px;
+    }
+
+    .filters {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .filter-select {
+      padding: 10px 15px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      background: white;
+      font-size: 16px;
+    }
+
+    .bookings-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .bookings-table th,
+    .bookings-table td {
+      padding: 15px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+
+    .bookings-table th {
+      background: rgba(102, 126, 234, 0.1);
+      font-weight: bold;
+      color: #333;
+    }
+
+    .bookings-table tr:hover {
+      background: rgba(102, 126, 234, 0.05);
+    }
+
+    .status-badge {
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 14px;
+      display: inline-block;
+    }
+
+    .status-badge.pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .status-badge.assigned {
+      background: #cce5ff;
+      color: #004085;
+    }
+
+    .status-badge.in-progress {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .status-badge.completed {
+      background: #d1ecf1;
+      color: #0c5460;
+    }
+
+    .status-badge.cancelled {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .action-btn {
+      background: rgba(102, 126, 234, 0.1);
+      border: none;
+      padding: 8px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    .action-btn:hover {
+      background: rgba(102, 126, 234, 0.2);
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      margin-top: 25px;
+      gap: 10px;
+    }
+
+    .page-btn {
+      padding: 10px 18px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      background: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .page-btn.active {
+      background: #ff6b6b;
+      color: white;
+      border-color: #ff6b6b;
+    }
+
+    .page-btn:hover:not(.active) {
+      background: #f8f9fa;
+    }
+
+    @media (max-width: 768px) {
+      .charts-section {
+        grid-template-columns: 1fr;
+      }
+      
+      .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      }
+      
+      .navbar {
+        padding: 15px 5%;
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .navbar a {
+        margin: 10px 5px;
+        padding: 10px 15px;
+        font-size: 16px;
+      }
+      
+      .filters {
+        width: 100%;
+        flex-direction: column;
+      }
+      
+      .filter-select {
+        width: 100%;
+      }
+    }
+
+    .dark-mode .navbar {
+      background: rgba(30, 30, 46, 0.7);
+    }
+
+    .dark-mode .navbar a {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff !important;
+    }
+
+    .dark-mode .navbar a:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .dark-mode .container {
+      color: #ffffff;
+    }
+
+    .dark-mode .stat-card {
+      background: rgba(30, 30, 46, 0.9);
+      color: #ffffff;
+    }
+
+    .dark-mode .stat-card h3 {
+      color: #ffeb3b !important;
+    }
+
+    .dark-mode .stat-value {
+      color: #ffeb3b !important;
+    }
+
+    .dark-mode .chart-container {
+      background: rgba(30, 30, 46, 0.9);
+      color: #ffffff;
+    }
+
+    .dark-mode .chart-container h3 {
+      color: #ffffff !important;
+    }
+
+    .dark-mode .bookings-section {
+      background: rgba(30, 30, 46, 0.9);
+      color: #ffffff;
+    }
+
+    .dark-mode .section-header h3 {
+      color: #ffffff !important;
+    }
+
+    .dark-mode .bookings-table th {
+      background: rgba(102, 126, 234, 0.3);
+      color: #ffffff !important;
+    }
+
+    .dark-mode .bookings-table td {
+      color: #ffffff !important;
+    }
+
+    .dark-mode .bookings-table tr:hover {
+      background: rgba(102, 126, 234, 0.1);
+    }
+
+    .dark-mode .btn {
+      color: #ffffff !important;
+    }
+
+    .dark-mode .btn-secondary {
+      color: #ffffff !important;
+    }
+
+    .dark-mode .action-btn {
+      background: rgba(102, 126, 234, 0.3);
+      color: #ffffff !important;
+    }
+
+    .dark-mode .dashboard-header h2 {
+      color: #ffffff !important;
+    }
+
+    .dark-mode .dashboard-header p {
+      color: #ffffff !important;
+    }
+
+    .dark-mode .filter-select {
+      background: rgba(30, 30, 46, 0.9);
+      color: #ffffff !important;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* Dark mode dropdown menu styles */
+    .dark-mode .dropdown-content {
+      background-color: #1e1e1e !important;
+      color: #ffffff !important;
+    }
+
+    .dark-mode .dropdown-content a {
+      color: #ffffff !important;
+      background-color: #1e1e1e !important;
+    }
+
+    .dark-mode .dropdown-content a:hover {
+      background-color: #333333 !important;
+      color: #ffeb3b !important;
+    }
+
+    .dark-mode .dropdown-btn {
+      background: rgba(255, 255, 255, 0.1) !important;
+      color: #ffffff !important;
+      border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+  </style>
+</head>
+<body>
+  <!-- Bubbles Container -->
+  <div class="bubbles">
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+  </div>
+  
+  <div class="navbar">
+    <h1> 🚑 ResQNow Admin </h1>
+    <div>
+      <a href="index.html">Home</a>
+      <a href="dashboard.html">User Dashboard</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="dashboard-header">
+      <h2>📊 Admin Dashboard</h2>
+      <p>Monitor and manage all ambulance bookings</p>
+    </div>
+    
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>Total Bookings</h3>
+        <div class="stat-value" id="totalBookings">0</div>
+        <div class="stat-change">↑ 12% from last month</div>
+      </div>
+      
+      <div class="stat-card">
+        <h3>Active Ambulances</h3>
+        <div class="stat-value" id="activeAmbulances">0</div>
+        <div class="stat-change">↑ 5% from last week</div>
+      </div>
+      
+      <div class="stat-card">
+        <h3>Completed Today</h3>
+        <div class="stat-value" id="completedToday">0</div>
+        <div class="stat-change">↑ 8% from yesterday</div>
+      </div>
+      
+      <div class="stat-card">
+        <h3>Avg. Response Time</h3>
+        <div class="stat-value" id="avgResponseTime">0</div>
+        <div class="stat-change negative">↓ 3% from yesterday</div>
+      </div>
+    </div>
+    
+    <div class="charts-section">
+      <div class="chart-container">
+        <h3>Bookings by Status</h3>
+        <canvas id="statusChart"></canvas>
+      </div>
+      
+      <div class="chart-container">
+        <h3>Bookings Over Time</h3>
+        <canvas id="timeChart"></canvas>
+      </div>
+    </div>
+    
+    <div class="charts-section">
+      <div class="chart-container">
+        <h3>🚑 Predictive Demand Analysis</h3>
+        <canvas id="demandChart"></canvas>
+      </div>
+      
+      <div class="chart-container">
+        <h3>⏱️ Response Time Heatmap</h3>
+        <canvas id="heatmapChart"></canvas>
+      </div>
+    </div>
+    
+    <div class="bookings-section">
+      <div class="section-header">
+        <h3>Recent Bookings</h3>
+        <div class="filters">
+          <select class="filter-select" id="statusFilter">
+            <option value="">All Statuses</option>
+            <option value="Pending">Pending</option>
+            <option value="Assigned">Assigned</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+          <select class="filter-select" id="dateFilter">
+            <option value="">All Dates</option>
+            <option value="today">Today</option>
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
+          </select>
+        </div>
+      </div>
+      
+      <table class="bookings-table">
+        <thead>
+          <tr>
+            <th>Booking ID</th>
+            <th>Patient</th>
+            <th>Contact</th>
+            <th>Locations</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="bookingsTableBody">
+          <!-- Bookings will be loaded here -->
+          <tr>
+            <td colspan="7" style="text-align: center;">Loading bookings...</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <div class="pagination">
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <button class="page-btn">Next →</button>
+      </div>
+    </div>
+    
+    <div class="bookings-section">
+      <div class="section-header">
+        <h3>🤖 Smart Dispatch Panel</h3>
+        <div class="filters">
+          <button class="btn" onclick="runAutoDispatch()">Run Auto-Dispatch</button>
+          <button class="btn btn-secondary" onclick="optimizePositioning()">Optimize Positioning</button>
+        </div>
+      </div>
+      
+      <div class="stats-grid">
+        <div class="stat-card">
+          <h3>Pending Assignments</h3>
+          <div class="stat-value" id="pendingAssignments">0</div>
+          <div class="stat-change">Needs immediate attention</div>
+        </div>
+        
+        <div class="stat-card">
+          <h3>Dispatch Efficiency</h3>
+          <div class="stat-value" id="dispatchEfficiency">92%</div>
+          <div class="stat-change positive">↑ 5% from last week</div>
+        </div>
+        
+        <div class="stat-card">
+          <h3>Avg. Assignment Time</h3>
+          <div class="stat-value" id="avgAssignmentTime">2.4s</div>
+          <div class="stat-change negative">↓ 0.3s from last week</div>
+        </div>
+      </div>
+      
+      <div class="dispatch-actions">
+        <h4>Quick Actions</h4>
+        <div class="actions">
+          <button class="action-btn" onclick="assignAllPending()">Assign All Pending</button>
+          <button class="action-btn" onclick="rebalanceFleet()">Rebalance Fleet</button>
+          <button class="action-btn" onclick="predictDemand()">Predict Demand</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Check if user is admin
+    document.addEventListener('DOMContentLoaded', function() {
+      const userRole = localStorage.getItem('userRole');
+      if (userRole !== 'admin') {
+        alert('Access denied. Admin privileges required.');
+        window.location.href = 'index.html';
+        return;
+      }
+      
+      // Load dashboard data
+      loadDashboardData();
+      loadBookings();
+      
+      // Initialize charts
+      initCharts();
+    });
+    
+    // Load dashboard statistics
+    async function loadDashboardData() {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          window.location.href = 'login.html';
+          return;
+        }
+        
+        // In a real app, this would fetch actual data from the API
+        // For now, we'll use mock data
+        document.getElementById('totalBookings').textContent = '1,248';
+        document.getElementById('activeAmbulances').textContent = '24';
+        document.getElementById('completedToday').textContent = '37';
+        document.getElementById('avgResponseTime').textContent = '12.4 min';
+        document.getElementById('pendingAssignments').textContent = '3';
+        document.getElementById('dispatchEfficiency').textContent = '92%';
+        document.getElementById('avgAssignmentTime').textContent = '2.4s';
+        
+      } catch (error) {
+        console.error('Error loading dashboard data:', error);
+      }
+    }
+    
+    // Load bookings
+    async function loadBookings() {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          window.location.href = 'login.html';
+          return;
+        }
+        
+        const response = await axios.get(`${API_BASE_URL}/book`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        const bookings = response.data.bookings;
+        const tableBody = document.getElementById('bookingsTableBody');
+        
+        // Clear existing rows
+        tableBody.innerHTML = '';
+        
+        // Add bookings to table (limit to 10 for display)
+        const displayBookings = bookings.slice(0, 10);
+        
+        if (displayBookings.length === 0) {
+          tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No bookings found</td></tr>';
+          return;
+        }
+        
+        displayBookings.forEach(booking => {
+          const row = document.createElement('tr');
+          
+          // Format dates
+          const bookingDate = new Date(booking.createdAt).toLocaleDateString();
+          
+          row.innerHTML = `
+            <td>${booking._id.substring(0, 8)}</td>
+            <td>${booking.patientName}</td>
+            <td>${booking.contactNumber}</td>
+            <td>${booking.pickupLocation} → ${booking.dropLocation}</td>
+            <td><span class="status-badge ${booking.status.toLowerCase().replace(' ', '-')}">${booking.status}</span></td>
+            <td>${bookingDate}</td>
+            <td>
+              <button class="action-btn" onclick="updateBookingStatus('${booking._id}')">Update</button>
+              <button class="action-btn" onclick="viewBooking('${booking._id}')">View</button>
+              ${!booking.driverId ? `<button class="action-btn" onclick="assignDriver('${booking._id}')">Assign</button>` : ''}
+            </td>
+          `;
+          
+          tableBody.appendChild(row);
+        });
+        
+      } catch (error) {
+        console.error('Error loading bookings:', error);
+        document.getElementById('bookingsTableBody').innerHTML = '<tr><td colspan="7" style="text-align: center;">Error loading bookings</td></tr>';
+      }
+    }
+    
+    // Initialize charts
+    function initCharts() {
+      // Status chart
+      const statusCtx = document.getElementById('statusChart').getContext('2d');
+      const statusChart = new Chart(statusCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Pending', 'Assigned', 'In Progress', 'Completed', 'Cancelled'],
+          datasets: [{
+            data: [12, 8, 5, 24, 3],
+            backgroundColor: [
+              '#fff3cd',
+              '#cce5ff',
+              '#d4edda',
+              '#d1ecf1',
+              '#f8d7da'
+            ],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }
+      });
+      
+      // Time chart
+      const timeCtx = document.getElementById('timeChart').getContext('2d');
+      const timeChart = new Chart(timeCtx, {
+        type: 'line',
+        data: {
+          labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          datasets: [{
+            label: 'Bookings',
+            data: [18, 22, 19, 25, 30, 35, 28],
+            borderColor: '#ff6b6b',
+            backgroundColor: 'rgba(255, 107, 107, 0.1)',
+            tension: 0.3,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+      
+      // Demand prediction chart
+      const demandCtx = document.getElementById('demandChart').getContext('2d');
+      const demandChart = new Chart(demandCtx, {
+        type: 'bar',
+        data: {
+          labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
+          datasets: [{
+            label: 'Current Demand',
+            data: [5, 3, 12, 18, 15, 8],
+            backgroundColor: 'rgba(255, 107, 107, 0.7)',
+            borderColor: '#ff6b6b',
+            borderWidth: 1
+          }, {
+            label: 'Predicted Demand',
+            data: [4, 4, 14, 20, 17, 7],
+            backgroundColor: 'rgba(102, 126, 234, 0.7)',
+            borderColor: '#667eea',
+            borderWidth: 1,
+            borderDash: [5, 5]
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'top'
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Number of Bookings'
+              }
+            }
+          }
+        }
+      });
+      
+      // Heatmap chart
+      const heatmapCtx = document.getElementById('heatmapChart').getContext('2d');
+      const heatmapChart = new Chart(heatmapCtx, {
+        type: 'bar',
+        data: {
+          labels: ['Zone A', 'Zone B', 'Zone C', 'Zone D', 'Zone E'],
+          datasets: [{
+            label: 'Avg. Response Time (minutes)',
+            data: [8, 12, 6, 15, 9],
+            backgroundColor: [
+              'rgba(40, 167, 69, 0.7)',
+              'rgba(255, 193, 7, 0.7)',
+              'rgba(40, 167, 69, 0.7)',
+              'rgba(220, 53, 69, 0.7)',
+              'rgba(255, 193, 7, 0.7)'
+            ],
+            borderColor: [
+              '#28a745',
+              '#ffc107',
+              '#28a745',
+              '#dc3545',
+              '#ffc107'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Minutes'
+              }
+            }
+          }
+        }
+      });
+    }
+    
+    // Update booking status
+    function updateBookingStatus(bookingId) {
+      const newStatus = prompt('Enter new status (Pending, Assigned, In Progress, Completed, Cancelled):');
+      if (newStatus) {
+        // In a real app, this would update the booking status via API
+        alert(`Booking ${bookingId} status updated to ${newStatus}`);
+        loadBookings(); // Refresh the list
+      }
+    }
+    
+    // View booking details
+    function viewBooking(bookingId) {
+      // In a real app, this would show detailed booking information
+      alert(`Viewing details for booking: ${bookingId}\nThis would show detailed information in a real application.`);
+    }
+    
+    // Assign driver to booking
+    function assignDriver(bookingId) {
+      // In a real app, this would assign a driver via API
+      alert(`Assigning driver to booking: ${bookingId}\nThis would use the smart dispatch system in a real application.`);
+      loadBookings(); // Refresh the list
+    }
+    
+    // Run auto-dispatch
+    function runAutoDispatch() {
+      alert('Running auto-dispatch system...\nThis would automatically assign drivers to pending bookings in a real application.');
+    }
+    
+    // Optimize positioning
+    function optimizePositioning() {
+      alert('Optimizing ambulance positioning...\nThis would analyze demand patterns and suggest optimal vehicle positioning in a real application.');
+    }
+    
+    // Assign all pending bookings
+    function assignAllPending() {
+      if (confirm('Assign drivers to all pending bookings?')) {
+        alert('Assigning drivers to all pending bookings...\nThis would use the smart dispatch algorithm in a real application.');
+        loadBookings(); // Refresh the list
+      }
+    }
+    
+    // Rebalance fleet
+    function rebalanceFleet() {
+      alert('Rebalancing fleet...\nThis would redistribute vehicles based on demand predictions in a real application.');
+    }
+    
+    // Predict demand
+    function predictDemand() {
+      alert('Predicting demand for the next 24 hours...\nThis would use machine learning models in a real application.');
+    }
+    
+    // Logout function
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('userName');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('loggedIn');
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>

@@ -6,6 +6,7 @@ const connectDB = require('./db');
 const authRoutes = require('./routes/authRoutes');
 const bookRoutes = require('./routes/bookRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
+const dispatchRoutes = require('./routes/dispatchRoutes');
 
 dotenv.config();
 
@@ -23,7 +24,7 @@ connectDB();
 app.use('/api/auth', authRoutes);
 app.use('/api/book', bookRoutes);
 app.use('/api/upload', uploadRoutes);
-
+app.use('/api/dispatch', dispatchRoutes);
 
 // Start server
 const PORT = process.env.PORT || 5000;

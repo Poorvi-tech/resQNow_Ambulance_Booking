@@ -1,214 +1,616 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Booking History</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        background-color: #f7f8fc;
-        box-sizing: border-box;
-        display: flex;
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Booking History | ResQNow</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="js/config.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #222;
+      animation: gradientBG 15s ease infinite;
+      background-size: 400% 400%;
+      min-height: 100vh;
+      position: relative;
+      overflow-y: auto;
+      font-size: 18px;
+    }
+    
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    /* Bubbles animation */
+    .bubbles {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+      top: 0;
+      left: 0;
+    }
+    
+    .bubble {
+      position: absolute;
+      bottom: -100px;
+      width: 80px;
+      height: 80px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      opacity: 0.5;
+      animation: rise 10s infinite ease-in;
+    }
+    
+    .bubble:nth-child(1) {
+      width: 80px;
+      height: 80px;
+      left: 10%;
+      animation-duration: 8s;
+      background: rgba(255, 107, 107, 0.3);
+    }
+    
+    .bubble:nth-child(2) {
+      width: 60px;
+      height: 60px;
+      left: 20%;
+      animation-duration: 5s;
+      animation-delay: 1s;
+      background: rgba(173, 216, 230, 0.3);
+    }
+    
+    .bubble:nth-child(3) {
+      width: 100px;
+      height: 100px;
+      left: 35%;
+      animation-duration: 7s;
+      animation-delay: 2s;
+      background: rgba(144, 238, 144, 0.3);
+    }
+    
+    .bubble:nth-child(4) {
+      width: 150px;
+      height: 150px;
+      left: 50%;
+      animation-duration: 11s;
+      animation-delay: 0s;
+      background: rgba(255, 182, 193, 0.3);
+    }
+    
+    .bubble:nth-child(5) {
+      width: 70px;
+      height: 70px;
+      left: 55%;
+      animation-duration: 6s;
+      animation-delay: 1s;
+      background: rgba(255, 255, 0, 0.3);
+    }
+    
+    .bubble:nth-child(6) {
+      width: 90px;
+      height: 90px;
+      left: 65%;
+      animation-duration: 8s;
+      background: rgba(153, 50, 204, 0.3);
+    }
+    
+    .bubble:nth-child(7) {
+      width: 70px;
+      height: 70px;
+      left: 75%;
+      animation-duration: 7s;
+      animation-delay: 3s;
+      background: rgba(255, 165, 0, 0.3);
+    }
+    
+    .bubble:nth-child(8) {
+      width: 130px;
+      height: 130px;
+      left: 80%;
+      animation-duration: 12s;
+      animation-delay: 2s;
+      background: rgba(0, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(9) {
+      width: 50px;
+      height: 50px;
+      left: 70%;
+      animation-duration: 5s;
+      animation-delay: 1s;
+      background: rgba(255, 192, 203, 0.3);
+    }
+    
+    .bubble:nth-child(10) {
+      width: 100px;
+      height: 100px;
+      left: 85%;
+      animation-duration: 9s;
+      animation-delay: 4s;
+      background: rgba(124, 252, 0, 0.3);
+    }
+    
+    @keyframes rise {
+      0% {
+        bottom: -100px;
+        transform: translateX(0);
+      }
+      50% {
+        transform: translateX(100px);
+      }
+      100% {
+        bottom: 1080px;
+        transform: translateX(-200px);
+      }
+    }
+
+    .navbar {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 25px 12%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      position: relative;
+      z-index: 100;
+    }
+
+    .navbar h1 {
+      color: #fff;
+      font-size: 36px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .navbar a {
+      text-decoration: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      padding: 15px 24px;
+      border-radius: 10px;
+      margin-left: 20px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(5px);
+      font-size: 20px;
+    }
+
+    .navbar a:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.05);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 50px auto;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      position: relative;
+      z-index: 10;
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 30px;
+      font-size: 32px;
+    }
+
+    .bookings-list {
+      display: grid;
+      gap: 20px;
+    }
+
+    .booking-card {
+      background: rgba(240, 240, 255, 0.8);
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      transition: transform 0.3s ease;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .booking-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .booking-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .booking-id {
+      font-weight: bold;
+      color: #555;
+    }
+
+    .booking-status {
+      display: inline-block;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .booking-status.pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .booking-status.assigned {
+      background: #cce5ff;
+      color: #004085;
+    }
+
+    .booking-status.in-progress {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .booking-status.completed {
+      background: #d1ecf1;
+      color: #0c5460;
+    }
+
+    .booking-status.cancelled {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .booking-details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .detail-item {
+      margin-bottom: 10px;
+    }
+
+    .detail-label {
+      font-weight: bold;
+      color: #555;
+      display: block;
+    }
+
+    .detail-value {
+      color: #333;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+      color: white;
+      padding: 12px 25px;
+      text-decoration: none;
+      font-weight: bold;
+      border-radius: 30px;
+      display: inline-block;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 107, 107, 0.5);
+      background: linear-gradient(135deg, #ff8e53, #ff6b6b);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, #6c757d, #495057);
+      box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+    }
+
+    .btn-secondary:hover {
+      box-shadow: 0 6px 20px rgba(108, 117, 125, 0.5);
+      background: linear-gradient(135deg, #495057, #6c757d);
+    }
+
+    .no-bookings {
+      text-align: center;
+      padding: 50px;
+      color: #666;
+      font-size: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        margin: 20px;
+        padding: 20px;
+      }
+      
+      .navbar {
+        padding: 15px 5%;
         flex-direction: column;
-        min-height: 100vh;
-      }
-
-      header {
-        background-color: #fff;
-        padding: 15px 10%;
-        border-bottom: 1px solid #ddd;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-      }
-
-      header h1 {
-        color: #e60050;
-        font-size: 20px;
-        margin: 0;
-      }
-
-      nav a {
-        text-decoration: none;
-        color: #e60050;
-        font-weight: bold;
-        margin-left: 15px;
-        font-size: 14px;
-        border: 1px solid #e60050;
-        padding: 6px 12px;
-        border-radius: 20px;
-      }
-
-      nav a:hover {
-        background-color: #e60050;
-        color: #fff;
-      }
-
-      h2 {
         text-align: center;
-        margin: 30px 0 20px;
-        color: #222;
       }
-
-      #history {
-        max-width: 600px;
-        margin: 0 auto;
-        width: 100%;
-        flex: 1;
-        padding: 0 15px;
+      
+      .navbar a {
+        margin: 10px 5px;
+        padding: 10px 15px;
+        font-size: 16px;
       }
-
-      .booking {
-        border: 1px solid #ddd;
-        background-color: #fff;
-        margin-bottom: 15px;
-        padding: 15px;
-        border-radius: 10px;
-        box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+      
+      .booking-details {
+        grid-template-columns: 1fr;
       }
-
-      .booking p {
-        margin: 6px 0;
-        font-size: 15px;
+      
+      .actions {
+        justify-content: center;
       }
+    }
 
-      a.home-button {
-        display: block;
-        text-align: center;
-        margin: 20px auto;
-        text-decoration: none;
-        background-color: #e60050;
-        color: #fff;
-        padding: 12px 24px;
-        border-radius: 8px;
-        max-width: 200px;
-        width: 100%;
-      }
+    .dark-mode .navbar {
+      background: rgba(30, 30, 46, 0.7);
+    }
 
-      a.home-button:hover {
-        background-color: #c80045;
-      }
+    .dark-mode .navbar a {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff !important;
+    }
 
-      footer {
-        text-align: center;
-        padding: 15px;
-        background-color: #fff;
-        border-top: 1px solid #ddd;
-        font-size: 13px;
-        color: #666;
-      }
+    .dark-mode .navbar a:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
 
-      @media (max-width: 480px) {
-        header {
-          padding: 10px 5%;
-        }
+    .dark-mode .container {
+      background: rgba(30, 30, 46, 0.9);
+      color: #ffffff;
+    }
 
-        header h1 {
-          font-size: 16px;
-        }
+    .dark-mode h2 {
+      color: #ffffff !important;
+    }
 
-        nav a {
-          margin-left: 8px;
-          font-size: 12px;
-          padding: 5px 10px;
-        }
+    .dark-mode .booking-card {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+    }
 
-        .booking p {
-          font-size: 14px;
-        }
+    .dark-mode .detail-label {
+      color: #ffeb3b !important;
+    }
 
-        a.home-button {
-          padding: 10px 16px;
-          font-size: 14px;
-        }
+    .dark-mode .detail-value {
+      color: #ffffff !important;
+    }
 
-        footer {
-          font-size: 12px;
-        }
-      }
+    .dark-mode .booking-status {
+      color: #ffffff !important;
+    }
 
-      .nav-left a {
-  text-decoration: none;
-}
+    .dark-mode .btn {
+      color: #ffffff !important;
+    }
 
-.nav-left h1 {
-  margin: 0;
-  font-size: 20px;
-  color: #e60050;
-  white-space: nowrap;
-  border-bottom: none; /* Ensure no underline */
-}
+    .dark-mode .btn-secondary {
+      color: #ffffff !important;
+    }
 
-    </style>
-  </head>
-  <body>
-    <!-- ✅ Header Start -->
-    <header>
-    <div class="nav-left">
-       <a href="index.html"><h1> 🚑 ResQNow </h1></a>
+    /* Dark mode dropdown menu styles */
+    .dark-mode .dropdown-content {
+      background-color: #1e1e1e !important;
+      color: #ffffff !important;
+    }
+
+    .dark-mode .dropdown-content a {
+      color: #ffffff !important;
+      background-color: #1e1e1e !important;
+    }
+
+    .dark-mode .dropdown-content a:hover {
+      background-color: #333333 !important;
+      color: #ffeb3b !important;
+    }
+
+    .dark-mode .dropdown-btn {
+      background: rgba(255, 255, 255, 0.1) !important;
+      color: #ffffff !important;
+      border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+  </style>
+</head>
+<body>
+  <!-- Bubbles Container -->
+  <div class="bubbles">
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
   </div>
-      <nav>
-         <a href="index.html">Home</a>
-        <a href="profile.html">Profile</a>
-      </nav>
-    </header>
-    <!-- ✅ Header End -->
+  
+  <div class="navbar">
+    <h1> 🚑 ResQNow </h1>
+    <div>
+      <a href="index.html">Home</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="book.html">Book Now</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </div>
+  </div>
 
-    <h2>🚑 My Booking History</h2>
+  <div class="container">
+    <h2>📅 Booking History</h2>
+    
+    <div class="bookings-list" id="bookingsList">
+      <!-- Bookings will be loaded here -->
+      <div class="no-bookings" id="noBookings">
+        Loading your booking history...
+      </div>
+    </div>
+  </div>
 
-    <div id="history"></div>
-
-   
-
-    <!-- ✅ Footer Start -->
-    <footer>&copy; 2025 ResQNow. All rights reserved.</footer>
-    <!-- ✅ Footer End -->
-
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script>
-      const token = localStorage.getItem("token");
-
-      async function loadHistory() {
-        try {
-          const res = await axios.get(
-            "https://resqnow-ambulance-booking.onrender.com/api/book/user-history",
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
-
-          const historyDiv = document.getElementById("history");
-          const bookings = res.data.bookings;
-
-          if (bookings.length === 0) {
-            historyDiv.innerHTML = "<p>No bookings found.</p>";
-            return;
-          }
-
-          bookings.forEach((b) => {
-            const div = document.createElement("div");
-            div.className = "booking";
-            div.innerHTML = `
-            <p><strong>Pickup:</strong> ${b.pickup}</p>
-            <p><strong>Destination:</strong> ${b.destination}</p>
-            <p><strong>Date:</strong> ${new Date(
-              b.createdAt
-            ).toLocaleString()}</p>
-          `;
-            historyDiv.appendChild(div);
-          });
-        } catch (err) {
-          document.getElementById("history").innerText =
-            "Failed to load history";
+  <script>
+    // Load booking history
+    async function loadBookingHistory() {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          window.location.href = 'login.html';
+          return;
         }
+        
+        const response = await axios.get(`${API_BASE_URL}/book/history`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        const bookings = response.data.data;
+        const bookingsList = document.getElementById('bookingsList');
+        const noBookings = document.getElementById('noBookings');
+        
+        if (bookings.length === 0) {
+          noBookings.innerHTML = 'No bookings found. <a href="book.html" class="btn" style="display: inline-block; margin-left: 10px;">Book Now</a>';
+          return;
+        }
+        
+        noBookings.style.display = 'none';
+        
+        // Clear existing bookings
+        bookingsList.innerHTML = '';
+        
+        // Add bookings to the list
+        bookings.forEach(booking => {
+          const bookingCard = document.createElement('div');
+          bookingCard.className = 'booking-card';
+          
+          // Format dates
+          const bookingDate = new Date(booking.bookingDate).toLocaleDateString();
+          const createdAt = new Date(booking.createdAt).toLocaleString();
+          
+          bookingCard.innerHTML = `
+            <div class="booking-header">
+              <span class="booking-id">Booking ID: ${booking._id.substring(0, 8)}</span>
+              <span class="booking-status ${booking.status.toLowerCase().replace(' ', '-')}">${booking.status}</span>
+            </div>
+            
+            <div class="booking-details">
+              <div class="detail-item">
+                <span class="detail-label">Patient Name</span>
+                <span class="detail-value">${booking.patientName}</span>
+              </div>
+              
+              <div class="detail-item">
+                <span class="detail-label">Pickup Location</span>
+                <span class="detail-value">${booking.pickupLocation}</span>
+              </div>
+              
+              <div class="detail-item">
+                <span class="detail-label">Drop Location</span>
+                <span class="detail-value">${booking.dropLocation}</span>
+              </div>
+              
+              <div class="detail-item">
+                <span class="detail-label">Booking Date</span>
+                <span class="detail-value">${bookingDate}</span>
+              </div>
+              
+              <div class="detail-item">
+                <span class="detail-label">Vehicle Type</span>
+                <span class="detail-value">${booking.vehicleType || 'Standard'}</span>
+              </div>
+              
+              <div class="detail-item">
+                <span class="detail-label">Emergency</span>
+                <span class="detail-value">${booking.emergency}</span>
+              </div>
+            </div>
+            
+            <div class="actions">
+              <button class="btn btn-secondary" onclick="viewDetails('${booking._id}')">View Details</button>
+              ${(booking.status === 'Assigned' || booking.status === 'In Progress') ? 
+                `<button class="btn" onclick="trackAmbulance('${booking._id}')">Track Ambulance</button>` : ''}
+              ${booking.status === 'Completed' && !booking.rating ? 
+                `<button class="btn" onclick="rateService('${booking._id}')">Rate Service</button>` : ''}
+            </div>
+          `;
+          
+          bookingsList.appendChild(bookingCard);
+        });
+        
+      } catch (error) {
+        console.error('Error loading booking history:', error);
+        document.getElementById('noBookings').innerHTML = 'Failed to load booking history. Please try again later.';
       }
-
-      loadHistory();
-    </script>
-  </body>
+    }
+    
+    // View booking details
+    function viewDetails(bookingId) {
+      // In a real app, this would show more details
+      alert(`Booking ID: ${bookingId}\nThis would show detailed booking information in a real application.`);
+    }
+    
+    // Track ambulance
+    function trackAmbulance(bookingId) {
+      window.location.href = `tracking.html?id=${bookingId}`;
+    }
+    
+    // Rate service
+    function rateService(bookingId) {
+      const rating = prompt('Rate this service (1-5):', '5');
+      if (rating && rating >= 1 && rating <= 5) {
+        const review = prompt('Leave a review (optional):', '');
+        // In a real app, this would submit the rating
+        alert('Thank you for your feedback!');
+        // Refresh the list
+        loadBookingHistory();
+      }
+    }
+    
+    // Logout function
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('userName');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('loggedIn');
+      window.location.href = 'index.html';
+    }
+    
+    // Load bookings when page loads
+    document.addEventListener('DOMContentLoaded', loadBookingHistory);
+  </script>
+</body>
 </html>

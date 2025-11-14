@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Track Ambulance | ResQNow</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script src="js/config.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #222;
+      animation: gradientBG 15s ease infinite;
+      background-size: 400% 400%;
+      min-height: 100vh;
+      position: relative;
+      overflow-y: auto;
+      font-size: 18px;
+    }
+    
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    /* Bubbles animation */
+    .bubbles {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+      top: 0;
+      left: 0;
+    }
+    
+    .bubble {
+      position: absolute;
+      bottom: -100px;
+      width: 80px;
+      height: 80px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      opacity: 0.5;
+      animation: rise 10s infinite ease-in;
+    }
+    
+    .bubble:nth-child(1) {
+      width: 80px;
+      height: 80px;
+      left: 10%;
+      animation-duration: 8s;
+      background: rgba(255, 107, 107, 0.3);
+    }
+    
+    .bubble:nth-child(2) {
+      width: 60px;
+      height: 60px;
+      left: 20%;
+      animation-duration: 5s;
+      animation-delay: 1s;
+      background: rgba(173, 216, 230, 0.3);
+    }
+    
+    .bubble:nth-child(3) {
+      width: 100px;
+      height: 100px;
+      left: 35%;
+      animation-duration: 7s;
+      animation-delay: 2s;
+      background: rgba(144, 238, 144, 0.3);
+    }
+    
+    .bubble:nth-child(4) {
+      width: 150px;
+      height: 150px;
+      left: 50%;
+      animation-duration: 11s;
+      animation-delay: 0s;
+      background: rgba(255, 182, 193, 0.3);
+    }
+    
+    .bubble:nth-child(5) {
+      width: 70px;
+      height: 70px;
+      left: 55%;
+      animation-duration: 6s;
+      animation-delay: 1s;
+      background: rgba(255, 255, 0, 0.3);
+    }
+    
+    .bubble:nth-child(6) {
+      width: 90px;
+      height: 90px;
+      left: 65%;
+      animation-duration: 8s;
+      background: rgba(153, 50, 204, 0.3);
+    }
+    
+    .bubble:nth-child(7) {
+      width: 70px;
+      height: 70px;
+      left: 75%;
+      animation-duration: 7s;
+      animation-delay: 3s;
+      background: rgba(255, 165, 0, 0.3);
+    }
+    
+    .bubble:nth-child(8) {
+      width: 130px;
+      height: 130px;
+      left: 80%;
+      animation-duration: 12s;
+      animation-delay: 2s;
+      background: rgba(0, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(9) {
+      width: 50px;
+      height: 50px;
+      left: 70%;
+      animation-duration: 5s;
+      animation-delay: 1s;
+      background: rgba(255, 192, 203, 0.3);
+    }
+    
+    .bubble:nth-child(10) {
+      width: 100px;
+      height: 100px;
+      left: 85%;
+      animation-duration: 9s;
+      animation-delay: 4s;
+      background: rgba(124, 252, 0, 0.3);
+    }
+    
+    @keyframes rise {
+      0% {
+        bottom: -100px;
+        transform: translateX(0);
+      }
+      50% {
+        transform: translateX(100px);
+      }
+      100% {
+        bottom: 1080px;
+        transform: translateX(-200px);
+      }
+    }
+
+    .navbar {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 25px 12%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      position: relative;
+      z-index: 100;
+    }
+
+    .navbar h1 {
+      color: #fff;
+      font-size: 36px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .navbar a {
+      text-decoration: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      padding: 15px 24px;
+      border-radius: 10px;
+      margin-left: 20px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(5px);
+      font-size: 20px;
+    }
+
+    .navbar a:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.05);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 50px auto;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      position: relative;
+      z-index: 10;
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 30px;
+      font-size: 32px;
+    }
+
+    .booking-info {
+      background: rgba(240, 240, 255, 0.8);
+      padding: 25px;
+      border-radius: 15px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .info-label {
+      font-weight: bold;
+      color: #555;
+    }
+
+    .info-value {
+      color: #333;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-weight: bold;
+      text-align: center;
+      margin: 10px 0;
+    }
+
+    .status.pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .status.assigned {
+      background: #cce5ff;
+      color: #004085;
+    }
+
+    .status.in-progress {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .status.completed {
+      background: #d1ecf1;
+      color: #0c5460;
+    }
+
+    .status.cancelled {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    #map {
+      height: 500px;
+      border-radius: 15px;
+      margin: 30px 0;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .tracking-info {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      margin: 20px 0;
+      gap: 20px;
+    }
+
+    .tracking-card {
+      background: rgba(240, 240, 255, 0.8);
+      padding: 20px;
+      border-radius: 15px;
+      text-align: center;
+      flex: 1;
+      min-width: 200px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .tracking-card h3 {
+      margin-bottom: 15px;
+      color: #555;
+    }
+
+    .tracking-card p {
+      font-size: 24px;
+      font-weight: bold;
+      color: #ff6b6b;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+      color: white;
+      padding: 15px 30px;
+      text-decoration: none;
+      font-weight: bold;
+      border-radius: 30px;
+      display: inline-block;
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      margin: 10px;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+      background: linear-gradient(135deg, #ff8e53, #ff6b6b);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .rating-section {
+      margin-top: 30px;
+      padding-top: 30px;
+      border-top: 1px solid #eee;
+    }
+
+    .stars {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+    }
+
+    .star {
+      font-size: 36px;
+      color: #ddd;
+      cursor: pointer;
+      transition: color 0.2s;
+      margin: 0 5px;
+    }
+
+    .star.active {
+      color: #ffcc00;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      margin: 15px 0;
+      font-family: inherit;
+      font-size: 16px;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        margin: 20px;
+        padding: 20px;
+      }
+      
+      .navbar {
+        padding: 15px 5%;
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .navbar a {
+        margin: 10px 5px;
+        padding: 10px 15px;
+        font-size: 16px;
+      }
+      
+      .info-row {
+        flex-direction: column;
+      }
+      
+      #map {
+        height: 300px;
+      }
+    }
+
+    .dark-mode .navbar {
+      background: rgba(30, 30, 46, 0.7);
+    }
+
+    .dark-mode .navbar a {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff !important;
+    }
+
+    .dark-mode .navbar a:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .dark-mode .container {
+      background: rgba(30, 30, 46, 0.9);
+      color: #ffffff;
+    }
+
+    .dark-mode h2 {
+      color: #ffffff !important;
+    }
+
+    .dark-mode .booking-info {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+    }
+
+    .dark-mode .info-label {
+      color: #ffeb3b !important;
+    }
+
+    .dark-mode .info-value {
+      color: #ffffff !important;
+    }
+
+    .dark-mode .tracking-card {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+    }
+
+    .dark-mode .tracking-card h3 {
+      color: #ffeb3b !important;
+    }
+
+    .dark-mode .tracking-card p {
+      color: #ffffff !important;
+    }
+
+    .dark-mode .btn {
+      color: #ffffff !important;
+    }
+
+    .dark-mode textarea {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff !important;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* Dark mode dropdown menu styles */
+    .dark-mode .dropdown-content {
+      background-color: #1e1e1e !important;
+      color: #ffffff !important;
+    }
+
+    .dark-mode .dropdown-content a {
+      color: #ffffff !important;
+      background-color: #1e1e1e !important;
+    }
+
+    .dark-mode .dropdown-content a:hover {
+      background-color: #333333 !important;
+      color: #ffeb3b !important;
+    }
+
+    .dark-mode .dropdown-btn {
+      background: rgba(255, 255, 255, 0.1) !important;
+      color: #ffffff !important;
+      border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+  </style>
+</head>
+<body>
+  <!-- Bubbles Container -->
+  <div class="bubbles">
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+  </div>
+  
+  <div class="navbar">
+    <h1> 🚑 ResQNow </h1>
+    <div>
+      <a href="index.html">Home</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="history.html">History</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <h2>🚑 Ambulance Tracking</h2>
+    
+    <div class="booking-info">
+      <div class="info-row">
+        <span class="info-label">Booking ID:</span>
+        <span class="info-value" id="bookingId">Loading...</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Patient Name:</span>
+        <span class="info-value" id="patientName">Loading...</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Pickup Location:</span>
+        <span class="info-value" id="pickupLocation">Loading...</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Drop Location:</span>
+        <span class="info-value" id="dropLocation">Loading...</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Booking Time:</span>
+        <span class="info-value" id="bookingTime">Loading...</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Status:</span>
+        <span class="status pending" id="bookingStatus">Loading...</span>
+      </div>
+    </div>
+    
+    <div id="trackingSection" style="display: none;">
+      <div class="tracking-info">
+        <div class="tracking-card">
+          <h3>Driver Name</h3>
+          <p id="driverName">Loading...</p>
+        </div>
+        <div class="tracking-card">
+          <h3>ETA</h3>
+          <p id="eta">Loading...</p>
+        </div>
+        <div class="tracking-card">
+          <h3>Contact</h3>
+          <p id="driverContact">Loading...</p>
+        </div>
+      </div>
+      
+      <div id="map"></div>
+      
+      <div style="text-align: center;">
+        <button class="btn" onclick="refreshTracking()">🔄 Refresh Location</button>
+        <button class="btn" onclick="callDriver()">📞 Call Driver</button>
+      </div>
+    </div>
+    
+    <div id="noTrackingInfo" style="text-align: center; display: none;">
+      <p>Your ambulance has not been assigned yet. Please wait while we process your request.</p>
+      <button class="btn" onclick="refreshTracking()">🔄 Check Status</button>
+    </div>
+    
+    <div id="ratingSection" class="rating-section" style="display: none;">
+      <h3>Rate Your Experience</h3>
+      <p>How would you rate the service?</p>
+      <div class="stars" id="stars">
+        <span class="star" data-rating="1">★</span>
+        <span class="star" data-rating="2">★</span>
+        <span class="star" data-rating="3">★</span>
+        <span class="star" data-rating="4">★</span>
+        <span class="star" data-rating="5">★</span>
+      </div>
+      <textarea id="review" placeholder="Leave a review (optional)"></textarea>
+      <div style="text-align: center;">
+        <button class="btn" onclick="submitRating()">Submit Rating</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Get booking ID from URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const bookingId = urlParams.get('id');
+    
+    // Map initialization
+    let map;
+    let ambulanceMarker;
+    
+    // Initialize map
+    function initMap() {
+      map = L.map('map').setView([28.6139, 77.2090], 13); // Default to New Delhi
+      
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+      
+      // Add ambulance icon
+      const ambulanceIcon = L.icon({
+        iconUrl: 'https://cdn-icons-png.flaticon.com/512/744/744465.png',
+        iconSize: [40, 40],
+        iconAnchor: [20, 20]
+      });
+      
+      ambulanceMarker = L.marker([28.6139, 77.2090], {icon: ambulanceIcon}).addTo(map);
+    }
+    
+    // Load booking details
+    async function loadBookingDetails() {
+      if (!bookingId) {
+        alert('Invalid booking ID');
+        window.location.href = 'history.html';
+        return;
+      }
+      
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          window.location.href = 'login.html';
+          return;
+        }
+        
+        const response = await axios.get(`${API_BASE_URL}/book/${bookingId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        const booking = response.data.booking;
+        
+        // Update UI with booking details
+        document.getElementById('bookingId').textContent = booking._id;
+        document.getElementById('patientName').textContent = booking.patientName;
+        document.getElementById('pickupLocation').textContent = booking.pickupLocation;
+        document.getElementById('dropLocation').textContent = booking.dropLocation;
+        document.getElementById('bookingTime').textContent = new Date(booking.createdAt).toLocaleString();
+        
+        // Update status
+        const statusElement = document.getElementById('bookingStatus');
+        statusElement.textContent = booking.status;
+        statusElement.className = 'status ' + booking.status.toLowerCase().replace(' ', '-');
+        
+        // Show appropriate section based on status
+        if (booking.status === 'Assigned' || booking.status === 'In Progress') {
+          document.getElementById('trackingSection').style.display = 'block';
+          document.getElementById('noTrackingInfo').style.display = 'none';
+          
+          // Update tracking info
+          document.getElementById('driverName').textContent = booking.driverId ? 'Driver #' + booking.driverId.substring(0, 6) : 'Assigning...';
+          document.getElementById('eta').textContent = booking.estimatedArrivalTime ? 
+            new Date(booking.estimatedArrivalTime).toLocaleTimeString() : 'Calculating...';
+          document.getElementById('driverContact').textContent = booking.driverId ? '+91 XXXXXXX' + booking.driverId.substring(0, 3) : 'N/A';
+          
+          // Update map if location is available
+          if (booking.currentLocation) {
+            const lat = booking.currentLocation.lat;
+            const lng = booking.currentLocation.lng;
+            map.setView([lat, lng], 15);
+            ambulanceMarker.setLatLng([lat, lng]);
+          }
+        } else if (booking.status === 'Completed') {
+          document.getElementById('trackingSection').style.display = 'none';
+          document.getElementById('noTrackingInfo').style.display = 'none';
+          document.getElementById('ratingSection').style.display = 'block';
+        } else {
+          document.getElementById('trackingSection').style.display = 'none';
+          document.getElementById('noTrackingInfo').style.display = 'block';
+        }
+        
+      } catch (error) {
+        console.error('Error loading booking details:', error);
+        alert('Failed to load booking details');
+      }
+    }
+    
+    // Refresh tracking information
+    async function refreshTracking() {
+      loadBookingDetails();
+    }
+    
+    // Call driver function
+    function callDriver() {
+      alert('Calling driver... (This would initiate a phone call in a real application)');
+    }
+    
+    // Submit rating
+    async function submitRating() {
+      const stars = document.querySelectorAll('.star.active');
+      const rating = stars.length;
+      const review = document.getElementById('review').value;
+      
+      if (rating === 0) {
+        alert('Please select a rating');
+        return;
+      }
+      
+      try {
+        const token = localStorage.getItem('token');
+        await axios.post(`${API_BASE_URL}/book/${bookingId}/rating`, {
+          rating,
+          review
+        }, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        alert('Thank you for your feedback!');
+        document.getElementById('ratingSection').style.display = 'none';
+      } catch (error) {
+        console.error('Error submitting rating:', error);
+        alert('Failed to submit rating');
+      }
+    }
+    
+    // Star rating functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const stars = document.querySelectorAll('.star');
+      
+      stars.forEach(star => {
+        star.addEventListener('click', function() {
+          const rating = this.getAttribute('data-rating');
+          
+          // Remove active class from all stars
+          stars.forEach(s => s.classList.remove('active'));
+          
+          // Add active class to clicked star and all previous stars
+          for (let i = 0; i < rating; i++) {
+            stars[i].classList.add('active');
+          }
+        });
+      });
+    });
+    
+    // Logout function
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('userName');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('loggedIn');
+      window.location.href = 'index.html';
+    }
+    
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      initMap();
+      loadBookingDetails();
+      
+      // Refresh tracking every 30 seconds
+      setInterval(refreshTracking, 30000);
+    });
+  </script>
+</body>
+</html>

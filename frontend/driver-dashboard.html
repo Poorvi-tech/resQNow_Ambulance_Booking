@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Driver Dashboard | ResQNow</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script src="js/config.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #222;
+      animation: gradientBG 15s ease infinite;
+      background-size: 400% 400%;
+      min-height: 100vh;
+      position: relative;
+      overflow-y: auto;
+      font-size: 18px;
+    }
+    
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    /* Bubbles animation */
+    .bubbles {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+      top: 0;
+      left: 0;
+    }
+    
+    .bubble {
+      position: absolute;
+      bottom: -100px;
+      width: 80px;
+      height: 80px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      opacity: 0.5;
+      animation: rise 10s infinite ease-in;
+    }
+    
+    .bubble:nth-child(1) {
+      width: 80px;
+      height: 80px;
+      left: 10%;
+      animation-duration: 8s;
+      background: rgba(255, 107, 107, 0.3);
+    }
+    
+    .bubble:nth-child(2) {
+      width: 60px;
+      height: 60px;
+      left: 20%;
+      animation-duration: 5s;
+      animation-delay: 1s;
+      background: rgba(173, 216, 230, 0.3);
+    }
+    
+    .bubble:nth-child(3) {
+      width: 100px;
+      height: 100px;
+      left: 35%;
+      animation-duration: 7s;
+      animation-delay: 2s;
+      background: rgba(144, 238, 144, 0.3);
+    }
+    
+    .bubble:nth-child(4) {
+      width: 150px;
+      height: 150px;
+      left: 50%;
+      animation-duration: 11s;
+      animation-delay: 0s;
+      background: rgba(255, 182, 193, 0.3);
+    }
+    
+    .bubble:nth-child(5) {
+      width: 70px;
+      height: 70px;
+      left: 55%;
+      animation-duration: 6s;
+      animation-delay: 1s;
+      background: rgba(255, 255, 0, 0.3);
+    }
+    
+    .bubble:nth-child(6) {
+      width: 90px;
+      height: 90px;
+      left: 65%;
+      animation-duration: 8s;
+      background: rgba(153, 50, 204, 0.3);
+    }
+    
+    .bubble:nth-child(7) {
+      width: 70px;
+      height: 70px;
+      left: 75%;
+      animation-duration: 7s;
+      animation-delay: 3s;
+      background: rgba(255, 165, 0, 0.3);
+    }
+    
+    .bubble:nth-child(8) {
+      width: 130px;
+      height: 130px;
+      left: 80%;
+      animation-duration: 12s;
+      animation-delay: 2s;
+      background: rgba(0, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(9) {
+      width: 50px;
+      height: 50px;
+      left: 70%;
+      animation-duration: 5s;
+      animation-delay: 1s;
+      background: rgba(255, 192, 203, 0.3);
+    }
+    
+    .bubble:nth-child(10) {
+      width: 100px;
+      height: 100px;
+      left: 85%;
+      animation-duration: 9s;
+      animation-delay: 4s;
+      background: rgba(124, 252, 0, 0.3);
+    }
+    
+    @keyframes rise {
+      0% {
+        bottom: -100px;
+        transform: translateX(0);
+      }
+      50% {
+        transform: translateX(100px);
+      }
+      100% {
+        bottom: 1080px;
+        transform: translateX(-200px);
+      }
+    }
+
+    .navbar {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 25px 12%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      position: relative;
+      z-index: 100;
+    }
+
+    .navbar h1 {
+      color: #fff;
+      font-size: 36px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .navbar a {
+      text-decoration: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      padding: 15px 24px;
+      border-radius: 10px;
+      margin-left: 20px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(5px);
+      font-size: 20px;
+    }
+
+    .navbar a:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.05);
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    .dashboard-header {
+      text-align: center;
+      color: white;
+      margin-bottom: 30px;
+    }
+
+    .dashboard-header h2 {
+      font-size: 36px;
+      margin-bottom: 10px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .driver-info {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 30px;
+      align-items: center;
+    }
+
+    .driver-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 48px;
+      font-weight: bold;
+    }
+
+    .driver-details {
+      flex: 1;
+      min-width: 300px;
+    }
+
+    .driver-details h3 {
+      font-size: 28px;
+      margin-bottom: 15px;
+      color: #333;
+    }
+
+    .detail-row {
+      display: flex;
+      margin-bottom: 12px;
+    }
+
+    .detail-label {
+      font-weight: bold;
+      width: 150px;
+      color: #555;
+    }
+
+    .detail-value {
+      color: #333;
+    }
+
+    .availability-toggle {
+      display: flex;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+      margin-right: 15px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 34px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #28a745;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+
+    .map-section {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .map-section h3 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+
+    #map {
+      height: 500px;
+      border-radius: 15px;
+    }
+
+    .current-assignment {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .assignment-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    .assignment-header h3 {
+      color: #333;
+      font-size: 24px;
+    }
+
+    .status-badge {
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 16px;
+      display: inline-block;
+    }
+
+    .status-badge.assigned {
+      background: #cce5ff;
+      color: #004085;
+    }
+
+    .status-badge.in-progress {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .assignment-details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 25px;
+      margin-bottom: 30px;
+    }
+
+    .detail-card {
+      background: rgba(240, 240, 255, 0.8);
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .detail-card h4 {
+      color: #555;
+      margin-bottom: 15px;
+      font-size: 20px;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+      color: white;
+      padding: 15px 30px;
+      text-decoration: none;
+      font-weight: bold;
+      border-radius: 30px;
+      display: inline-block;
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+      background: linear-gradient(135deg, #ff8e53, #ff6b6b);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #28a745, #218838);
+      box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+    }
+
+    .btn-success:hover {
+      box-shadow: 0 6px 20px rgba(40, 167, 69, 0.6);
+      background: linear-gradient(135deg, #218838, #28a745);
+    }
+
+    .btn-warning {
+      background: linear-gradient(135deg, #ffc107, #e0a800);
+      box-shadow: 0 6px 20px rgba(255, 193, 7, 0.4);
+    }
+
+    .btn-warning:hover {
+      box-shadow: 0 6px 20px rgba(255, 193, 7, 0.6);
+      background: linear-gradient(135deg, #e0a800, #ffc107);
+    }
+
+    .btn-info {
+      background: linear-gradient(135deg, #17a2b8, #138496);
+      box-shadow: 0 6px 20px rgba(23, 162, 184, 0.4);
+    }
+
+    .btn-info:hover {
+      box-shadow: 0 6px 20px rgba(23, 162, 184, 0.6);
+      background: linear-gradient(135deg, #138496, #17a2b8);
+    }
+
+    .no-assignment {
+      text-align: center;
+      padding: 50px;
+      color: #666;
+      font-size: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .driver-info {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .detail-row {
+        justify-content: center;
+      }
+      
+      .assignment-details {
+        grid-template-columns: 1fr;
+      }
+      
+      #map {
+        height: 300px;
+      }
+    }
+
+    .dark-mode .navbar {
+      background: rgba(30, 30, 46, 0.7);
+    }
+
+    .dark-mode .navbar a {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff !important;
+    }
+
+    .dark-mode .navbar a:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .dark-mode .container {
+      color: #ffffff;
+    }
+
+    .dark-mode .driver-info {
+      background: rgba(30, 30, 46, 0.9);
+      color: #ffffff;
+    }
+
+    .dark-mode .driver-details h3 {
+      color: #ffffff !important;
+    }
+
+    .dark-mode .detail-label {
+      color: #ffeb3b !important;
+    }
+
+    .dark-mode .detail-value {
+      color: #ffffff !important;
+    }
+
+    .dark-mode .map-section {
+      background: rgba(30, 30, 46, 0.9);
+      color: #ffffff;
+    }
+
+    .dark-mode .map-section h3 {
+      color: #ffffff !important;
+    }
+
+    .dark-mode .current-assignment {
+      background: rgba(30, 30, 46, 0.9);
+      color: #ffffff;
+    }
+
+    .dark-mode .assignment-header h3 {
+      color: #ffffff !important;
+    }
+
+    .dark-mode .detail-card {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+    }
+
+    .dark-mode .detail-card h4 {
+      color: #ffeb3b !important;
+    }
+
+    .dark-mode .btn {
+      color: #ffffff !important;
+    }
+
+    .dark-mode .dashboard-header h2 {
+      color: #ffffff !important;
+    }
+
+    .dark-mode .dashboard-header p {
+      color: #ffffff !important;
+    }
+
+    /* Dark mode dropdown menu styles */
+    .dark-mode .dropdown-content {
+      background-color: #1e1e1e !important;
+      color: #ffffff !important;
+    }
+
+    .dark-mode .dropdown-content a {
+      color: #ffffff !important;
+      background-color: #1e1e1e !important;
+    }
+
+    .dark-mode .dropdown-content a:hover {
+      background-color: #333333 !important;
+      color: #ffeb3b !important;
+    }
+
+    .dark-mode .dropdown-btn {
+      background: rgba(255, 255, 255, 0.1) !important;
+      color: #ffffff !important;
+      border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+  </style>
+</head>
+<body>
+  <!-- Bubbles Container -->
+  <div class="bubbles">
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+  </div>
+  
+  <div class="navbar">
+    <h1> 🚑 ResQNow Driver </h1>
+    <div>
+      <a href="index.html">Home</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="dashboard-header">
+      <h2>🚗 Driver Dashboard</h2>
+      <p>Manage your ambulance assignments and location</p>
+    </div>
+    
+    <div class="driver-info">
+      <div class="driver-avatar" id="driverInitials">JD</div>
+      <div class="driver-details">
+        <h3 id="driverName">Loading...</h3>
+        <div class="detail-row">
+          <span class="detail-label">Driver ID:</span>
+          <span class="detail-value" id="driverId">Loading...</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">License Number:</span>
+          <span class="detail-value" id="licenseNumber">Loading...</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Vehicle Assigned:</span>
+          <span class="detail-value" id="vehicleAssigned">Loading...</span>
+        </div>
+        <div class="availability-toggle">
+          <label class="switch">
+            <input type="checkbox" id="availabilityToggle" checked>
+            <span class="slider"></span>
+          </label>
+          <span id="availabilityStatus">Available for assignments</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="map-section">
+      <h3>📍 Your Current Location</h3>
+      <div id="map"></div>
+    </div>
+    
+    <div class="current-assignment">
+      <div class="assignment-header">
+        <h3>🚑 Current Assignment</h3>
+        <span class="status-badge assigned" id="assignmentStatus">Assigned</span>
+      </div>
+      
+      <div id="assignmentDetails">
+        <div class="assignment-details">
+          <div class="detail-card">
+            <h4>Patient Information</h4>
+            <div class="detail-row">
+              <span class="detail-label">Name:</span>
+              <span class="detail-value" id="patientName">John Doe</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Contact:</span>
+              <span class="detail-value" id="patientContact">+91 98765 43210</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Emergency:</span>
+              <span class="detail-value" id="emergencyType">Cardiac Arrest</span>
+            </div>
+          </div>
+          
+          <div class="detail-card">
+            <h4>Locations</h4>
+            <div class="detail-row">
+              <span class="detail-label">Pickup:</span>
+              <span class="detail-value" id="pickupLocation">123 Main St, New Delhi</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Drop:</span>
+              <span class="detail-value" id="dropLocation">Apollo Hospital, New Delhi</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Distance:</span>
+              <span class="detail-value" id="distance">2.4 km</span>
+            </div>
+          </div>
+          
+          <div class="detail-card">
+            <h4>Timing</h4>
+            <div class="detail-row">
+              <span class="detail-label">Booking Time:</span>
+              <span class="detail-value" id="bookingTime">10:30 AM, Today</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">ETA:</span>
+              <span class="detail-value" id="eta">10:45 AM</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Status:</span>
+              <span class="detail-value" id="bookingStatus">En route to pickup</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="actions">
+          <button class="btn btn-info" onclick="navigateToPickup()">Navigate to Pickup</button>
+          <button class="btn btn-warning" onclick="markArrived()">Mark Arrived at Pickup</button>
+          <button class="btn btn-success" onclick="markCompleted()">Mark Trip Completed</button>
+        </div>
+      </div>
+      
+      <div id="noAssignment" class="no-assignment" style="display: none;">
+        <p>No current assignments. You're available for new bookings!</p>
+        <button class="btn" onclick="refreshAssignments()">Check for New Assignments</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Map initialization
+    let map;
+    let ambulanceMarker;
+    let pickupMarker;
+    let hospitalMarker;
+    
+    // Initialize map
+    function initMap() {
+      map = L.map('map').setView([28.6139, 77.2090], 13); // Default to New Delhi
+      
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+      
+      // Add ambulance icon
+      const ambulanceIcon = L.icon({
+        iconUrl: 'https://cdn-icons-png.flaticon.com/512/744/744465.png',
+        iconSize: [40, 40],
+        iconAnchor: [20, 20]
+      });
+      
+      // Add pickup icon
+      const pickupIcon = L.icon({
+        iconUrl: 'https://cdn-icons-png.flaticon.com/512/25/25694.png',
+        iconSize: [30, 30],
+        iconAnchor: [15, 15]
+      });
+      
+      // Add hospital icon
+      const hospitalIcon = L.icon({
+        iconUrl: 'https://cdn-icons-png.flaticon.com/512/747/747310.png',
+        iconSize: [30, 30],
+        iconAnchor: [15, 15]
+      });
+      
+      // Add markers
+      ambulanceMarker = L.marker([28.6139, 77.2090], {icon: ambulanceIcon}).addTo(map);
+      pickupMarker = L.marker([28.6239, 77.2190], {icon: pickupIcon}).addTo(map);
+      hospitalMarker = L.marker([28.6039, 77.1990], {icon: hospitalIcon}).addTo(map);
+      
+      // Add route line
+      const route = [
+        [28.6139, 77.2090],
+        [28.6239, 77.2190],
+        [28.6039, 77.1990]
+      ];
+      
+      L.polyline(route, {color: '#ff6b6b', weight: 5}).addTo(map);
+    }
+    
+    // Load driver information
+    async function loadDriverInfo() {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          window.location.href = 'login.html';
+          return;
+        }
+        
+        // In a real app, this would fetch actual driver data from the API
+        // For now, we'll use mock data
+        const userName = localStorage.getItem('userName') || 'Driver Name';
+        document.getElementById('driverName').textContent = userName;
+        document.getElementById('driverId').textContent = 'DRV-' + Math.floor(1000 + Math.random() * 9000);
+        document.getElementById('licenseNumber').textContent = 'DL-' + Math.floor(100000 + Math.random() * 900000);
+        document.getElementById('vehicleAssigned').textContent = 'Ambulance #' + Math.floor(100 + Math.random() * 900);
+        document.getElementById('driverInitials').textContent = userName.split(' ').map(n => n[0]).join('').substring(0, 2);
+        
+      } catch (error) {
+        console.error('Error loading driver info:', error);
+      }
+    }
+    
+    // Toggle availability
+    function toggleAvailability() {
+      const toggle = document.getElementById('availabilityToggle');
+      const status = document.getElementById('availabilityStatus');
+      
+      if (toggle.checked) {
+        status.textContent = 'Available for assignments';
+      } else {
+        status.textContent = 'Not available for assignments';
+      }
+      
+      // In a real app, this would update the driver's availability status via API
+    }
+    
+    // Navigate to pickup
+    function navigateToPickup() {
+      alert('Opening navigation to pickup location...');
+      // In a real app, this would open the device's navigation app
+    }
+    
+    // Mark arrived at pickup
+    function markArrived() {
+      if (confirm('Mark as arrived at pickup location?')) {
+        document.getElementById('bookingStatus').textContent = 'Arrived at pickup';
+        document.getElementById('assignmentStatus').className = 'status-badge in-progress';
+        document.getElementById('assignmentStatus').textContent = 'In Progress';
+        // In a real app, this would update the booking status via API
+      }
+    }
+    
+    // Mark trip completed
+    function markCompleted() {
+      if (confirm('Mark this trip as completed?')) {
+        document.getElementById('assignmentDetails').style.display = 'none';
+        document.getElementById('noAssignment').style.display = 'block';
+        // In a real app, this would update the booking status via API
+      }
+    }
+    
+    // Refresh assignments
+    function refreshAssignments() {
+      alert('Checking for new assignments...');
+      // In a real app, this would fetch new assignments from the API
+    }
+    
+    // Logout function
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('userName');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('loggedIn');
+      window.location.href = 'index.html';
+    }
+    
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      // Check if user is a driver
+      const userRole = localStorage.getItem('userRole');
+      if (userRole !== 'driver') {
+        alert('Access denied. Driver privileges required.');
+        window.location.href = 'index.html';
+        return;
+      }
+      
+      initMap();
+      loadDriverInfo();
+      
+      // Set up availability toggle
+      document.getElementById('availabilityToggle').addEventListener('change', toggleAvailability);
+      
+      // Simulate location updates
+      setInterval(updateLocation, 5000);
+    });
+    
+    // Simulate location updates
+    function updateLocation() {
+      // In a real app, this would get the actual GPS location
+      const lat = 28.6139 + (Math.random() - 0.5) * 0.01;
+      const lng = 77.2090 + (Math.random() - 0.5) * 0.01;
+      
+      map.setView([lat, lng], 15);
+      ambulanceMarker.setLatLng([lat, lng]);
+    }
+  </script>
+</body>
+</html>

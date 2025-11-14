@@ -35,9 +35,26 @@ vehicleType: {
 },
   status: {
     type: String,
-    enum: ['Pending', 'Completed', 'Cancelled'],
+    enum: ['Pending', 'Assigned', 'In Progress', 'Completed', 'Cancelled'],
     default: 'Pending'
-  }
+  },
+  // Real-time tracking fields
+  driverId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  currentLocation: {
+    lat: Number,
+    lng: Number
+  },
+  estimatedArrivalTime: Date,
+  // Rating system
+  rating: {
+    type: Number,
+    min: 1,
+    max: 5
+  },
+  review: String
 }, { timestamps: true });
 
 module.exports = mongoose.model('Booking', bookingSchema);

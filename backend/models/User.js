@@ -21,12 +21,12 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['user', 'admin'],
+    enum: ['user', 'driver', 'admin'],
     default: 'user'
   },
   isVerified: {
     type: Boolean,
-    default: false
+    default: true
   },
   profilePhoto: {
     type: String,
@@ -40,11 +40,18 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
-  otp: {
-    type: String
+  // Driver specific fields
+  licenseNumber: {
+    type: String,
+    default: ''
   },
-  otpExpires: {
-    type: Date
+  vehicleAssigned: {
+    type: String,
+    default: ''
+  },
+  availability: {
+    type: Boolean,
+    default: true
   }
 }, { timestamps: true });
 

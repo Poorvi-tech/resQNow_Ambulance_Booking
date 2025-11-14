@@ -1,161 +1,382 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>User Profile - ResQNow</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
       font-family: 'Inter', sans-serif;
-      background: #f7f8fc;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       margin: 0;
       color: #222;
-      overflow-x: hidden;
-    }header {
-  background-color: #fff;
-  padding: 20px 10%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-  border-bottom: 1px solid #eee;
-}
+      animation: gradientBG 15s ease infinite;
+      background-size: 400% 400%;
+      min-height: 100vh;
+      position: relative;
+      overflow-y: auto;
+    }
+    
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    /* Bubbles animation */
+    .bubbles {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+      top: 0;
+      left: 0;
+    }
+    
+    .bubble {
+      position: absolute;
+      bottom: -100px;
+      width: 80px;
+      height: 80px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      opacity: 0.5;
+      animation: rise 10s infinite ease-in;
+    }
+    
+    .bubble:nth-child(1) {
+      width: 80px;
+      height: 80px;
+      left: 10%;
+      animation-duration: 8s;
+      background: rgba(255, 107, 107, 0.3);
+    }
+    
+    .bubble:nth-child(2) {
+      width: 60px;
+      height: 60px;
+      left: 20%;
+      animation-duration: 5s;
+      animation-delay: 1s;
+      background: rgba(173, 216, 230, 0.3);
+    }
+    
+    .bubble:nth-child(3) {
+      width: 100px;
+      height: 100px;
+      left: 35%;
+      animation-duration: 7s;
+      animation-delay: 2s;
+      background: rgba(144, 238, 144, 0.3);
+    }
+    
+    .bubble:nth-child(4) {
+      width: 150px;
+      height: 150px;
+      left: 50%;
+      animation-duration: 11s;
+      animation-delay: 0s;
+      background: rgba(255, 182, 193, 0.3);
+    }
+    
+    .bubble:nth-child(5) {
+      width: 70px;
+      height: 70px;
+      left: 55%;
+      animation-duration: 6s;
+      animation-delay: 1s;
+      background: rgba(255, 255, 0, 0.3);
+    }
+    
+    .bubble:nth-child(6) {
+      width: 90px;
+      height: 90px;
+      left: 65%;
+      animation-duration: 8s;
+      background: rgba(153, 50, 204, 0.3);
+    }
+    
+    .bubble:nth-child(7) {
+      width: 70px;
+      height: 70px;
+      left: 75%;
+      animation-duration: 7s;
+      animation-delay: 3s;
+      background: rgba(255, 165, 0, 0.3);
+    }
+    
+    .bubble:nth-child(8) {
+      width: 130px;
+      height: 130px;
+      left: 80%;
+      animation-duration: 12s;
+      animation-delay: 2s;
+      background: rgba(0, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(9) {
+      width: 50px;
+      height: 50px;
+      left: 70%;
+      animation-duration: 5s;
+      animation-delay: 1s;
+      background: rgba(255, 192, 203, 0.3);
+    }
+    
+    .bubble:nth-child(10) {
+      width: 100px;
+      height: 100px;
+      left: 85%;
+      animation-duration: 9s;
+      animation-delay: 4s;
+      background: rgba(124, 252, 0, 0.3);
+    }
+    
+    @keyframes rise {
+      0% {
+        bottom: -100px;
+        transform: translateX(0);
+      }
+      50% {
+        transform: translateX(100px);
+      }
+      100% {
+        bottom: 1080px;
+        transform: translateX(-200px);
+      }
+    }
 
-header h1 {
-  color: #e60050;
-  font-weight: 700;
-  font-size: 26px;
-  margin: 0;
-}
+    header {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px 10%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      position: relative;
+      z-index: 100;
+    }
 
-nav {
-  display: flex;
-  gap: 15px;
-  align-items: center;
-  flex-wrap: wrap;
-}
+    header h1 {
+      color: #fff;
+      font-weight: 700;
+      font-size: 34px;
+      margin: 0;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
 
-nav a {
-  text-decoration: none;
-  color: #333;
-  font-weight: 600;
-  font-size: 14px;
-  padding: 6px 12px;
-  border-radius: 5px;
-}
+    nav {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
 
-nav a:hover {
-  background: #ffe6ec;
-  color: #e60050;
-}
+    nav a {
+      text-decoration: none;
+      color: #fff;
+      font-weight: 600;
+      font-size: 20px;
+      padding: 14px 20px;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(5px);
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
 
-.container {
-  padding: 40px 10%;
-  max-width: 1200px;
-  margin: 0 auto;
-}
+    nav a:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
 
-.section {
-  background: #fff;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 0 12px rgba(0,0,0,0.05);
-  margin-bottom: 30px;
-}
+    .container {
+      padding: 40px 10%;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
 
-.section h2 {
-  color: #e60050;
-  margin-bottom: 15px;
-}
+    .section {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.05);
+      margin-bottom: 30px;
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
 
-.label {
-  font-weight: 600;
-  margin-top: 10px;
-  display: block;
-}
+    .section h2 {
+      color: #ff6b6b;
+      margin-bottom: 15px;
+      font-size: 24px;
+    }
 
-input[type="file"], input[type="text"] {
-  width: 100%;
-  padding: 12px;
-  margin: 8px 0 20px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 14px;
-}
+    .label {
+      font-weight: 600;
+      margin-top: 10px;
+      display: block;
+      color: #333;
+    }
 
-button {
-  background-color: #e60050;
-  color: white;
-  padding: 12px 20px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: background 0.3s ease;
-}
+    input[type="file"], input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+      background-color: #fefefe;
+      transition: all 0.3s ease;
+    }
+    
+    input[type="file"]:focus, input[type="text"]:focus {
+      outline: none;
+      border-color: #ff6b6b;
+      box-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+    }
 
-button:hover {
-  background-color: #c80045;
-}
+    button {
+      background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+    }
 
-img.preview, img.profile-photo {
-  max-width: 100px;
-  border-radius: 50%;
-  margin-top: 10px;
-}
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+      background: linear-gradient(135deg, #ff8e53, #ff6b6b);
+    }
+    
+    button:active {
+      transform: translateY(1px);
+    }
 
-footer {
-  background: #f4f4f4;
-  text-align: center;
-  padding: 20px 10%;
-  color: #555;
-  border-top: 1px solid #ddd;
-  font-size: 13px;
-}
+    img.preview, img.profile-photo {
+      max-width: 100px;
+      border-radius: 50%;
+      margin-top: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
 
-footer a {
-  color: #e60050;
-  text-decoration: none;
-  font-weight: 500;
-}
+    footer {
+      background: rgba(0, 0, 0, 0.2);
+      text-align: center;
+      padding: 20px 10%;
+      color: #fff;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      font-size: 13px;
+      backdrop-filter: blur(5px);
+      position: relative;
+      z-index: 10;
+    }
 
-#deleteAccountBtn {
-  background-color: red;
-  margin-top: 20px;
-  width: 100%;
-}
+    footer a {
+      color: #ffeb3b;
+      text-decoration: none;
+      font-weight: 500;
+      text-shadow: 0 0 5px rgba(255, 235, 59, 0.5);
+    }
 
-@media (max-width: 768px) {
-  header {
-    flex-direction: column;
-    text-align: center;
-  }
+    #deleteAccountBtn {
+      background: linear-gradient(135deg, #ff416c, #ff4b2b);
+      margin-top: 20px;
+      width: 100%;
+    }
+    
+    .home-button {
+      display: inline-block;
+      background: linear-gradient(135deg, #4CAF50, #45a049);
+      color: white;
+      text-decoration: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      margin-top: 15px;
+      width: 100%;
+      text-align: center;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+    }
+    
+    .home-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(76, 175, 80, 0.6);
+      background: linear-gradient(135deg, #45a049, #4CAF50);
+    }
 
-  .container {
-    padding: 20px 5%;
-  }
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        text-align: center;
+      }
 
-  button, #deleteAccountBtn {
-    width: 100%;
-  }
-}
+      .container {
+        padding: 20px 5%;
+      }
 
-.nav-left a {
-  text-decoration: none;
-}
+      button, #deleteAccountBtn {
+        width: 100%;
+      }
+    }
 
-.nav-left h1 {
-  margin: 0;
-  font-size: 20px;
-  color: #e60050;
-  white-space: nowrap;
-  border-bottom: none;
-}
+    .nav-left a {
+      text-decoration: none;
+    }
 
+    .nav-left h1 {
+      margin: 0;
+      font-size: 20px;
+      color: #fff;
+      white-space: nowrap;
+      border-bottom: none;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    /* Pulsing animation for important elements */
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    
+    .pulse {
+      animation: pulse 2s infinite;
+    }
   </style>
 </head>
 <body>
+  <!-- Bubbles Container -->
+  <div class="bubbles">
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+  </div>
+  
   <header>
       <div class="nav-left">
         <a href="index.html"><h1>🚑 ResQNow</h1></a>
@@ -163,33 +384,40 @@ footer a {
     <nav>
       <span id="auth-links"></span>
     </nav>
-  </header>  <div class="container">
-    <div class="section" id="user-info"></div>
-    <div class="section" id="booking-history"></div>
-    <div class="section">
+  </header>  
+  <div class="container">
+    <div class="section pulse" id="user-info"></div>
+    <div class="section pulse" id="booking-history"></div>
+    <div class="section pulse">
       <h2>Edit Profile</h2>
       <form id="profile-form" enctype="multipart/form-data">
         <label class="label">Profile Picture:</label>
         <input type="file" id="profilePhoto" accept="image/*" onchange="showPreview(event)" />
-        <img id="preview-img" class="preview" src="#" style="display:none;" /><label class="label">Name:</label>
-    <input type="text" id="edit-name" placeholder="Enter your name" value="">
+        <img id="preview-img" class="preview" src="#" style="display:none;" />
+        
+        <label class="label">Name:</label>
+        <input type="text" id="edit-name" placeholder="Enter your name" value="">
 
-    <label class="label">Upload Aadhaar Card:</label>
-    <input type="file" id="aadhaarCard" name="aadhaarCard" accept=".pdf,.jpg,.jpeg,.png" />
+        <label class="label">Upload Aadhaar Card:</label>
+        <input type="file" id="aadhaarCard" name="aadhaarCard" accept=".pdf,.jpg,.jpeg,.png" />
 
-    <label class="label">Upload Medical Certificate:</label>
-    <input type="file" id="medicalCertificate" name="medicalCertificate" accept=".pdf,.jpg,.jpeg,.png" />
+        <label class="label">Upload Medical Certificate:</label>
+        <input type="file" id="medicalCertificate" name="medicalCertificate" accept=".pdf,.jpg,.jpeg,.png" />
 
-    <button type="submit">Update Profile</button>
-  </form>
-</div>
-<button id="deleteAccountBtn">Delete My Account</button>
-
-  </div>  <footer>
+        <button type="submit">Update Profile</button>
+      </form>
+    </div>
+    <button id="deleteAccountBtn">Delete My Account</button>
+    <a href="index.html" class="home-button">🏠 Go to Home</a>
+  </div>  
+  <footer>
     <p>© 2025 Ambulance Booking. All rights reserved.</p>
     <p><strong>Phone:</strong> 1800-234-001</p>
     <p><strong>Email:</strong> <a href="mailto:support@resqnow.com">support@resqnow.com</a></p>
-  </footer>  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>  <script>
+  </footer>  
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="js/config.js"></script>  
+  <script>
     const userId = localStorage.getItem("userId");
     const token = localStorage.getItem("token");
 
@@ -200,7 +428,7 @@ footer a {
     }
 
     const photoPath = localStorage.getItem("userPhoto") || '';
-    const profileImgTag = photoPath ? `<img src="https://resqnow-backend-lru3.onrender.com/${photoPath}" class="profile-photo">` : '';
+    const profileImgTag = photoPath ? `<img src="${BASE_URL}/${photoPath}" class="profile-photo">` : '';
 
     document.getElementById("user-info").innerHTML = `
       ${profileImgTag}
@@ -226,7 +454,7 @@ footer a {
 
       try {
         const name = document.getElementById("edit-name").value;
-        await axios.put('https://resqnow-ambulance-booking.onrender.com/api/auth/update-profile', { name }, {
+        await axios.put(`${API_BASE_URL}/auth/update-profile`, { name }, {
           headers: { Authorization: `Bearer ${token}` }
         });
         localStorage.setItem("userName", name);
@@ -235,7 +463,7 @@ footer a {
         if (photo) {
           const form = new FormData();
           form.append("photo", photo);
-          await axios.post('https://resqnow-ambulance-booking.onrender.com/api/upload/photo', form, {
+          await axios.post(`${API_BASE_URL}/upload/photo`, form, {
             headers: { Authorization: `Bearer ${token}` }
           });
         }
@@ -244,7 +472,7 @@ footer a {
         if (aadhaar) {
           const form = new FormData();
           form.append("aadhaar", aadhaar);
-          await axios.post('https://resqnow-ambulance-booking.onrender.com/api/upload/aadhaar', form, {
+          await axios.post(`${API_BASE_URL}/upload/aadhaar`, form, {
             headers: { Authorization: `Bearer ${token}` }
           });
         }
@@ -253,7 +481,7 @@ footer a {
         if (medical) {
           const form = new FormData();
           form.append("medicalCertificate", medical);
-          await axios.post('https://resqnow-ambulance-booking.onrender.com/api/upload/medical', form, {
+          await axios.post(`${API_BASE_URL}/upload/medical`, form, {
             headers: { Authorization: `Bearer ${token}` }
           });
         }
@@ -271,7 +499,7 @@ footer a {
     document.getElementById('deleteAccountBtn').addEventListener('click', async () => {
       if (confirm('Are you sure you want to delete your account? This action is irreversible.')) {
         try {
-          await axios.delete('https://resqnow-ambulance-booking.onrender.com/api/auth/delete', {
+          await axios.delete(`${API_BASE_URL}/auth/delete`, {
             headers: { Authorization: `Bearer ${token}` }
           });
 
@@ -283,5 +511,6 @@ footer a {
         }
       }
     });
-  </script></body>
+  </script>
+</body>
 </html>

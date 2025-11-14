@@ -1,42 +1,206 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background: linear-gradient(to right, #00c6ff, #0072ff);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-  }
-  
-  .signup-container {
-    background: #fff;
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: 0 0 20px rgba(0,0,0,0.2);
-    width: 400px;
-    text-align: center;
-  }
-  
-  input {
+    animation: gradientBG 15s ease infinite;
+    background-size: 400% 400%;
+    position: relative;
+    overflow: hidden;
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Bubbles animation */
+.bubbles {
+    position: absolute;
     width: 100%;
-    padding: 12px;
-    margin: 12px 0;
-    border-radius: 8px;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+    top: 0;
+    left: 0;
+}
+
+.bubble {
+    position: absolute;
+    bottom: -100px;
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    opacity: 0.5;
+    animation: rise 10s infinite ease-in;
+}
+
+.bubble:nth-child(1) {
+    width: 80px;
+    height: 80px;
+    left: 10%;
+    animation-duration: 8s;
+    background: rgba(255, 107, 107, 0.3);
+}
+
+.bubble:nth-child(2) {
+    width: 60px;
+    height: 60px;
+    left: 20%;
+    animation-duration: 5s;
+    animation-delay: 1s;
+    background: rgba(173, 216, 230, 0.3);
+}
+
+.bubble:nth-child(3) {
+    width: 100px;
+    height: 100px;
+    left: 35%;
+    animation-duration: 7s;
+    animation-delay: 2s;
+    background: rgba(144, 238, 144, 0.3);
+}
+
+.bubble:nth-child(4) {
+    width: 150px;
+    height: 150px;
+    left: 50%;
+    animation-duration: 11s;
+    animation-delay: 0s;
+    background: rgba(255, 182, 193, 0.3);
+}
+
+.bubble:nth-child(5) {
+    width: 70px;
+    height: 70px;
+    left: 55%;
+    animation-duration: 6s;
+    animation-delay: 1s;
+    background: rgba(255, 255, 0, 0.3);
+}
+
+.bubble:nth-child(6) {
+    width: 90px;
+    height: 90px;
+    left: 65%;
+    animation-duration: 8s;
+    background: rgba(153, 50, 204, 0.3);
+}
+
+.bubble:nth-child(7) {
+    width: 70px;
+    height: 70px;
+    left: 75%;
+    animation-duration: 7s;
+    animation-delay: 3s;
+    background: rgba(255, 165, 0, 0.3);
+}
+
+.bubble:nth-child(8) {
+    width: 130px;
+    height: 130px;
+    left: 80%;
+    animation-duration: 12s;
+    animation-delay: 2s;
+    background: rgba(0, 255, 255, 0.3);
+}
+
+.bubble:nth-child(9) {
+    width: 50px;
+    height: 50px;
+    left: 70%;
+    animation-duration: 5s;
+    animation-delay: 1s;
+    background: rgba(255, 192, 203, 0.3);
+}
+
+.bubble:nth-child(10) {
+    width: 100px;
+    height: 100px;
+    left: 85%;
+    animation-duration: 9s;
+    animation-delay: 4s;
+    background: rgba(124, 252, 0, 0.3);
+}
+
+@keyframes rise {
+    0% {
+        bottom: -100px;
+        transform: translateX(0);
+    }
+    50% {
+        transform: translateX(100px);
+    }
+    100% {
+        bottom: 1080px;
+        transform: translateX(-200px);
+    }
+}
+
+.signup-container {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 50px;
+    border-radius: 15px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.2);
+    width: 500px;
+    text-align: center;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+input {
+    width: 100%;
+    padding: 16px;
+    margin: 15px 0;
+    border-radius: 10px;
     border: 1px solid #ccc;
-  }
-  
-  button {
-    background-color: #0072ff;
+    transition: all 0.3s ease;
+    background-color: #fefefe;
+    font-size: 18px;
+}
+
+input:focus {
+    outline: none;
+    border-color: #ff6b6b;
+    box-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+}
+
+button {
+    background: linear-gradient(135deg, #ff6b6b, #ff8e53);
     color: white;
-    padding: 12px;
+    padding: 16px;
     width: 100%;
     border: none;
-    border-radius: 8px;
+    border-radius: 12px;
     font-weight: bold;
+    font-size: 20px;
     cursor: pointer;
-  }
-  
-  button:hover {
-    background-color: #005ed6;
-  }
-  
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+}
+
+button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+    background: linear-gradient(135deg, #ff8e53, #ff6b6b);
+}
+
+button:active {
+    transform: translateY(1px);
+}
+
+/* Pulsing animation for important elements */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}

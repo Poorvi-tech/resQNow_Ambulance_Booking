@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Medical Assistant | ResQNow</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="js/config.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #222;
+      animation: gradientBG 15s ease infinite;
+      background-size: 400% 400%;
+      min-height: 100vh;
+      position: relative;
+      overflow-y: auto;
+      font-size: 18px;
+    }
+    
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    /* Bubbles animation */
+    .bubbles {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+      top: 0;
+      left: 0;
+    }
+    
+    .bubble {
+      position: absolute;
+      bottom: -100px;
+      width: 80px;
+      height: 80px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      opacity: 0.5;
+      animation: rise 10s infinite ease-in;
+    }
+    
+    .bubble:nth-child(1) {
+      width: 80px;
+      height: 80px;
+      left: 10%;
+      animation-duration: 8s;
+      background: rgba(255, 107, 107, 0.3);
+    }
+    
+    .bubble:nth-child(2) {
+      width: 60px;
+      height: 60px;
+      left: 20%;
+      animation-duration: 5s;
+      animation-delay: 1s;
+      background: rgba(173, 216, 230, 0.3);
+    }
+    
+    .bubble:nth-child(3) {
+      width: 100px;
+      height: 100px;
+      left: 35%;
+      animation-duration: 7s;
+      animation-delay: 2s;
+      background: rgba(144, 238, 144, 0.3);
+    }
+    
+    .bubble:nth-child(4) {
+      width: 150px;
+      height: 150px;
+      left: 50%;
+      animation-duration: 11s;
+      animation-delay: 0s;
+      background: rgba(255, 182, 193, 0.3);
+    }
+    
+    .bubble:nth-child(5) {
+      width: 70px;
+      height: 70px;
+      left: 55%;
+      animation-duration: 6s;
+      animation-delay: 1s;
+      background: rgba(255, 255, 0, 0.3);
+    }
+    
+    .bubble:nth-child(6) {
+      width: 90px;
+      height: 90px;
+      left: 65%;
+      animation-duration: 8s;
+      background: rgba(153, 50, 204, 0.3);
+    }
+    
+    .bubble:nth-child(7) {
+      width: 70px;
+      height: 70px;
+      left: 75%;
+      animation-duration: 7s;
+      animation-delay: 3s;
+      background: rgba(255, 165, 0, 0.3);
+    }
+    
+    .bubble:nth-child(8) {
+      width: 130px;
+      height: 130px;
+      left: 80%;
+      animation-duration: 12s;
+      animation-delay: 2s;
+      background: rgba(0, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(9) {
+      width: 50px;
+      height: 50px;
+      left: 70%;
+      animation-duration: 5s;
+      animation-delay: 1s;
+      background: rgba(255, 192, 203, 0.3);
+    }
+    
+    .bubble:nth-child(10) {
+      width: 100px;
+      height: 100px;
+      left: 85%;
+      animation-duration: 9s;
+      animation-delay: 4s;
+      background: rgba(124, 252, 0, 0.3);
+    }
+    
+    @keyframes rise {
+      0% {
+        bottom: -100px;
+        transform: translateX(0);
+      }
+      50% {
+        transform: translateX(100px);
+      }
+      100% {
+        bottom: 1080px;
+        transform: translateX(-200px);
+      }
+    }
+
+    .navbar {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 25px 12%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      position: relative;
+      z-index: 100;
+    }
+
+    .navbar h1 {
+      color: #fff;
+      font-size: 36px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .navbar a {
+      text-decoration: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      padding: 15px 24px;
+      border-radius: 10px;
+      margin-left: 20px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(5px);
+      font-size: 20px;
+    }
+
+    .navbar a:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.05);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    .assistant-header {
+      text-align: center;
+      color: white;
+      margin-bottom: 30px;
+    }
+
+    .assistant-header h2 {
+      font-size: 36px;
+      margin-bottom: 10px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .assistant-header p {
+      font-size: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .search-section {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      text-align: center;
+    }
+
+    .search-section h3 {
+      color: #333;
+      margin-bottom: 25px;
+      font-size: 28px;
+    }
+
+    .search-box {
+      display: flex;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .search-input {
+      flex: 1;
+      padding: 15px 20px;
+      border: 2px solid #ddd;
+      border-radius: 30px 0 0 30px;
+      font-size: 18px;
+      outline: none;
+    }
+
+    .search-input:focus {
+      border-color: #667eea;
+    }
+
+    .search-btn {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      padding: 0 30px;
+      border-radius: 0 30px 30px 0;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 18px;
+      transition: all 0.3s ease;
+    }
+
+    .search-btn:hover {
+      background: linear-gradient(135deg, #764ba2, #667eea);
+    }
+
+    .quick-links {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin: 30px 0;
+    }
+
+    .link-card {
+      background: rgba(255, 255, 255, 0.8);
+      padding: 25px;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .link-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    .link-icon {
+      font-size: 48px;
+      margin-bottom: 15px;
+    }
+
+    .link-card h4 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 22px;
+    }
+
+    .results-section {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      display: none;
+    }
+
+    .results-section h3 {
+      color: #333;
+      margin-bottom: 25px;
+      font-size: 28px;
+      text-align: center;
+    }
+
+    .result-item {
+      background: rgba(240, 240, 255, 0.8);
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .result-item h4 {
+      color: #555;
+      margin-bottom: 10px;
+      font-size: 20px;
+    }
+
+    .symptom-checker {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .symptom-checker h3 {
+      color: #333;
+      margin-bottom: 25px;
+      font-size: 28px;
+      text-align: center;
+    }
+
+    .symptom-options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .symptom-option {
+      background: rgba(240, 240, 255, 0.8);
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+
+    .symptom-option:hover {
+      background: rgba(102, 126, 234, 0.2);
+    }
+
+    .symptom-option.selected {
+      background: rgba(102, 126, 234, 0.3);
+      border-color: #667eea;
+      font-weight: bold;
+    }
+
+    .emergency-level {
+      text-align: center;
+      padding: 20px;
+      border-radius: 10px;
+      margin: 20px 0;
+      display: none;
+    }
+
+    .level-low {
+      background: rgba(40, 167, 69, 0.2);
+      color: #155724;
+      border: 1px solid #28a745;
+    }
+
+    .level-medium {
+      background: rgba(255, 193, 7, 0.2);
+      color: #856404;
+      border: 1px solid #ffc107;
+    }
+
+    .level-high {
+      background: rgba(220, 53, 69, 0.2);
+      color: #721c24;
+      border: 1px solid #dc3545;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+      color: white;
+      padding: 15px 30px;
+      text-decoration: none;
+      font-weight: bold;
+      border-radius: 30px;
+      display: inline-block;
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      margin: 10px;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+      background: linear-gradient(135deg, #ff8e53, #ff6b6b);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn-emergency {
+      background: linear-gradient(135deg, #ff0000, #b30000);
+      box-shadow: 0 6px 20px rgba(255, 0, 0, 0.4);
+    }
+
+    .btn-emergency:hover {
+      box-shadow: 0 6px 20px rgba(255, 0, 0, 0.6);
+      background: linear-gradient(135deg, #b30000, #ff0000);
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 15px 5%;
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .navbar a {
+        margin: 10px 5px;
+        padding: 10px 15px;
+        font-size: 16px;
+      }
+      
+      .search-box {
+        flex-direction: column;
+      }
+      
+      .search-input {
+        border-radius: 30px;
+        margin-bottom: 10px;
+      }
+      
+      .search-btn {
+        border-radius: 30px;
+        padding: 15px;
+      }
+      
+      .quick-links {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .dark-mode .navbar {
+      background: rgba(30, 30, 46, 0.7);
+    }
+
+    .dark-mode .navbar a {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff !important;
+    }
+
+    .dark-mode .navbar a:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .dark-mode .container {
+      color: #ffffff;
+    }
+
+    .dark-mode .assistant-header h2 {
+      color: #ffffff !important;
+    }
+
+    .dark-mode .assistant-header p {
+      color: #ffffff !important;
+    }
+
+    .dark-mode .search-section {
+      background: rgba(30, 30, 46, 0.9);
+      color: #ffffff;
+    }
+
+    .dark-mode .search-section h3 {
+      color: #ffffff !important;
+    }
+
+    .dark-mode .search-input {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff !important;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .dark-mode .search-btn {
+      color: #ffffff !important;
+    }
+
+    .dark-mode .link-card {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+    }
+
+    .dark-mode .link-card h4 {
+      color: #ffffff !important;
+    }
+
+    .dark-mode .results-section {
+      background: rgba(30, 30, 46, 0.9);
+      color: #ffffff;
+    }
+
+    .dark-mode .results-section h3 {
+      color: #ffffff !important;
+    }
+
+    .dark-mode .result-item {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+    }
+
+    .dark-mode .result-item h4 {
+      color: #ffffff !important;
+    }
+
+    .dark-mode .symptom-checker {
+      background: rgba(30, 30, 46, 0.9);
+      color: #ffffff;
+    }
+
+    .dark-mode .symptom-checker h3 {
+      color: #ffffff !important;
+    }
+
+    .dark-mode .symptom-option {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+    }
+
+    .dark-mode .symptom-option.selected {
+      background: rgba(102, 126, 234, 0.3);
+      color: #ffffff;
+    }
+
+    .dark-mode .btn {
+      color: #ffffff !important;
+    }
+
+    .dark-mode .btn-emergency {
+      color: #ffffff !important;
+    }
+
+    /* Dark mode dropdown menu styles */
+    .dark-mode .dropdown-content {
+      background-color: #1e1e1e !important;
+      color: #ffffff !important;
+    }
+
+    .dark-mode .dropdown-content a {
+      color: #ffffff !important;
+      background-color: #1e1e1e !important;
+    }
+
+    .dark-mode .dropdown-content a:hover {
+      background-color: #333333 !important;
+      color: #ffeb3b !important;
+    }
+
+    .dark-mode .dropdown-btn {
+      background: rgba(255, 255, 255, 0.1) !important;
+      color: #ffffff !important;
+      border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+  </style>
+</head>
+<body>
+  <!-- Bubbles Container -->
+  <div class="bubbles">
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+  </div>
+  
+  <div class="navbar">
+    <h1> 🏥 ResQNow Medical Assistant </h1>
+    <div>
+      <a href="index.html">Home</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="assistant-header">
+      <h2>🩺 Medical Information Assistant</h2>
+      <p>Get instant medical information, symptom checking, and emergency guidance</p>
+    </div>
+    
+    <div class="search-section">
+      <h3>🔍 Search Medical Information</h3>
+      <div class="search-box">
+        <input type="text" class="search-input" id="searchInput" placeholder="Search for symptoms, conditions, treatments...">
+        <button class="search-btn" onclick="performSearch()">Search</button>
+      </div>
+      
+      <div class="quick-links">
+        <div class="link-card" onclick="searchCondition('heart attack')">
+          <div class="link-icon">❤️</div>
+          <h4>Heart Attack</h4>
+          <p>Recognize symptoms and response</p>
+        </div>
+        <div class="link-card" onclick="searchCondition('stroke')">
+          <div class="link-icon">🧠</div>
+          <h4>Stroke</h4>
+          <p>FAST signs and treatment</p>
+        </div>
+        <div class="link-card" onclick="searchCondition('cpr')">
+          <div class="link-icon">🫀</div>
+          <h4>CPR Guide</h4>
+          <p>Cardiopulmonary resuscitation</p>
+        </div>
+        <div class="link-card" onclick="searchCondition('choking')">
+          <div class="link-icon">💨</div>
+          <h4>Choking</h4>
+          <p>Heimlich maneuver technique</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="results-section" id="resultsSection">
+      <h3>📋 Search Results</h3>
+      <div id="searchResults">
+        <!-- Results will be populated here -->
+      </div>
+    </div>
+    
+    <div class="symptom-checker">
+      <h3>🩺 Symptom Checker</h3>
+      <p>Select your symptoms to get an emergency level assessment:</p>
+      
+      <div class="symptom-options">
+        <div class="symptom-option" onclick="toggleSymptom(this)">Chest Pain</div>
+        <div class="symptom-option" onclick="toggleSymptom(this)">Difficulty Breathing</div>
+        <div class="symptom-option" onclick="toggleSymptom(this)">Severe Bleeding</div>
+        <div class="symptom-option" onclick="toggleSymptom(this)">Loss of Consciousness</div>
+        <div class="symptom-option" onclick="toggleSymptom(this)">Severe Headache</div>
+        <div class="symptom-option" onclick="toggleSymptom(this)">High Fever</div>
+        <div class="symptom-option" onclick="toggleSymptom(this)">Severe Abdominal Pain</div>
+        <div class="symptom-option" onclick="toggleSymptom(this)">Broken Bone</div>
+      </div>
+      
+      <div style="text-align: center;">
+        <button class="btn" onclick="assessSymptoms()">Assess Symptoms</button>
+      </div>
+      
+      <div class="emergency-level" id="emergencyLevel">
+        <!-- Emergency level will be displayed here -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Perform search
+    function performSearch() {
+      const query = document.getElementById('searchInput').value.trim();
+      if (!query) {
+        alert('Please enter a search term');
+        return;
+      }
+      
+      showResults(query);
+    }
+    
+    // Search for specific condition
+    function searchCondition(condition) {
+      document.getElementById('searchInput').value = condition;
+      showResults(condition);
+    }
+    
+    // Show search results
+    function showResults(query) {
+      const resultsSection = document.getElementById('resultsSection');
+      const searchResults = document.getElementById('searchResults');
+      
+      // Mock results based on query
+      let results = [];
+      
+      if (query.toLowerCase().includes('heart')) {
+        results = [
+          {
+            title: "Heart Attack Symptoms",
+            content: "Common signs include: chest pain or discomfort, upper body pain, shortness of breath, cold sweat, nausea, lightheadedness. Women may experience additional symptoms like back or jaw pain."
+          },
+          {
+            title: "Immediate Actions",
+            content: "1. Call emergency services immediately (1800-234-001)\n2. Take aspirin if not allergic\n3. Sit down and stay calm\n4. If prescribed, take nitroglycerin\n5. Begin CPR if person becomes unconscious"
+          },
+          {
+            title: "When to Seek Emergency Care",
+            content: "Seek immediate medical attention if you experience severe chest pain lasting more than a few minutes, especially with other symptoms like shortness of breath, nausea, or sweating."
+          }
+        ];
+      } else if (query.toLowerCase().includes('stroke')) {
+        results = [
+          {
+            title: "Stroke Recognition (FAST)",
+            content: "F - Face drooping: Ask person to smile\nA - Arm weakness: Ask person to raise both arms\nS - Speech difficulty: Ask person to repeat a simple phrase\nT - Time to call emergency services"
+          },
+          {
+            title: "Stroke Symptoms",
+            content: "Sudden numbness or weakness of face, arm, or leg (especially on one side), confusion, trouble speaking, severe headache, trouble seeing, trouble walking."
+          },
+          {
+            title: "Emergency Response",
+            content: "Call 1800-234-001 immediately. Note the time symptoms began. Do not give food or drink. Keep person still and comfortable. Monitor breathing."
+          }
+        ];
+      } else if (query.toLowerCase().includes('cpr')) {
+        results = [
+          {
+            title: "CPR Steps (Adults)",
+            content: "1. Check responsiveness\n2. Call for help\n3. Position hands on center of chest\n4. Push hard and fast (2 inches deep)\n5. Give 30 compressions\n6. Give 2 rescue breaths\n7. Continue cycles until help arrives"
+          },
+          {
+            title: "Compression Rate",
+            content: "100-120 compressions per minute. Use the beat of 'Stayin' Alive' by the Bee Gees as a guide."
+          },
+          {
+            title: "Hands-Only CPR",
+            content: "If you're untrained, perform hands-only CPR: push hard and fast on the center of the chest at 100-120 compressions per minute."
+          }
+        ];
+      } else if (query.toLowerCase().includes('choking')) {
+        results = [
+          {
+            title: "Heimlich Maneuver (Adults)",
+            content: "1. Stand behind the person\n2. Wrap arms around their waist\n3. Make a fist with one hand\n4. Place fist just above navel\n5. Grab fist with other hand\n6. Give quick, upward thrusts"
+          },
+          {
+            title: "Choking Signs",
+            content: "Universal sign (hands at throat), inability to speak, cough, or breathe, blue lips or face, loss of consciousness."
+          },
+          {
+            title: "Back Blows",
+            content: "If the person is pregnant or obese, give 5 back blows between shoulder blades instead of abdominal thrusts."
+          }
+        ];
+      } else {
+        results = [
+          {
+            title: "General Medical Information",
+            content: "For medical emergencies, always call 1800-234-001 or your local emergency number. When in doubt, it's better to seek medical attention early rather than wait."
+          },
+          {
+            title: "First Aid Kit Essentials",
+            content: "Include bandages, antiseptic wipes, pain relievers, thermometer, tweezers, scissors, gloves, emergency contact information."
+          }
+        ];
+      }
+      
+      // Display results
+      searchResults.innerHTML = '';
+      results.forEach(result => {
+        const resultItem = document.createElement('div');
+        resultItem.className = 'result-item';
+        resultItem.innerHTML = `
+          <h4>${result.title}</h4>
+          <p>${result.content.replace(/\n/g, '<br>')}</p>
+        `;
+        searchResults.appendChild(resultItem);
+      });
+      
+      resultsSection.style.display = 'block';
+      
+      // Scroll to results
+      resultsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    // Toggle symptom selection
+    function toggleSymptom(element) {
+      element.classList.toggle('selected');
+    }
+    
+    // Assess symptoms
+    function assessSymptoms() {
+      const selectedSymptoms = document.querySelectorAll('.symptom-option.selected');
+      const emergencyLevel = document.getElementById('emergencyLevel');
+      
+      if (selectedSymptoms.length === 0) {
+        alert('Please select at least one symptom');
+        return;
+      }
+      
+      // Determine emergency level based on symptoms
+      let level = 'low';
+      let message = '';
+      let buttonText = 'Monitor Symptoms';
+      let buttonClass = '';
+      
+      // Check for high emergency symptoms
+      const highEmergencySymptoms = ['Chest Pain', 'Difficulty Breathing', 'Severe Bleeding', 'Loss of Consciousness'];
+      const mediumEmergencySymptoms = ['Severe Headache', 'High Fever', 'Severe Abdominal Pain'];
+      
+      const symptomTexts = Array.from(selectedSymptoms).map(s => s.textContent);
+      
+      if (symptomTexts.some(symptom => highEmergencySymptoms.includes(symptom))) {
+        level = 'high';
+        message = '🚨 HIGH EMERGENCY - Call 1800-234-001 immediately or go to the nearest emergency room. These symptoms require urgent medical attention.';
+        buttonText = 'Call Emergency Services';
+        buttonClass = 'btn-emergency';
+      } else if (symptomTexts.some(symptom => mediumEmergencySymptoms.includes(symptom))) {
+        level = 'medium';
+        message = '⚠️ MEDIUM EMERGENCY - Seek medical attention soon. These symptoms may worsen and require professional evaluation.';
+      } else {
+        level = 'low';
+        message = '✅ LOW EMERGENCY - These symptoms may not require immediate emergency care, but monitor them closely. Consider seeing a doctor if they persist or worsen.';
+      }
+      
+      emergencyLevel.innerHTML = `
+        <h4>Emergency Assessment</h4>
+        <p>${message}</p>
+        <button class="btn ${buttonClass}" onclick="handleEmergency('${level}')">${buttonText}</button>
+      `;
+      emergencyLevel.className = 'emergency-level level-' + level;
+      emergencyLevel.style.display = 'block';
+      
+      // Scroll to assessment
+      emergencyLevel.scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    // Handle emergency based on level
+    function handleEmergency(level) {
+      if (level === 'high') {
+        if (confirm('This will call emergency services. Are you sure?')) {
+          alert('Calling 1800-234-001... (This would initiate a phone call in a real application)');
+          // In a real app: window.location.href = 'tel:1800234001';
+        }
+      } else if (level === 'medium') {
+        alert('Please consider visiting a healthcare facility soon or calling your doctor.');
+      } else {
+        alert('Continue to monitor your symptoms. If they worsen, seek medical attention.');
+      }
+    }
+    
+    // Logout function
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('userName');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('loggedIn');
+      window.location.href = 'index.html';
+    }
+    
+    // Allow search on Enter key
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('searchInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          performSearch();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

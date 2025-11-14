@@ -1,23 +1,42 @@
 const express = require('express');
 const router = express.Router();
-const authController = require('../controllers/authController')
+const { register, login, forgotPassword, resetPassword, updateProfile, getProfile, makeAdmin, makeDriver, makeUser, deleteAccount, getDrivers, updateDriverAvailability } = require('../controllers/authController');
 const authenticateToken = require('../middleware/authMiddleware');
-const { deleteAccount } = require('../controllers/authController');
 
+// Register a new user
+router.post('/register', register);
 
-router.put('/update-profile', authenticateToken, authController.updateProfile);
-router.post('/register', authController.register);
-router.post('/verify-otp', authController.verifyOTP);
-router.post('/login', authController.login);
-router.post('/forgot-password', authController.forgotPassword);
-router.post('/reset-password', authController.resetPassword);
-router.post('/resend-otp', authController.resendOTP);
-router.get('/profile', authenticateToken, authController.getProfile);
-router.delete('/delete', authenticateToken, authController.deleteAccount);
+// Login
+router.post('/login', login);
 
-router.get('/make-admin/:email', authController.makeAdmin);
+// Forgot password
+router.post('/forgot-password', forgotPassword);
 
-router.get('/make-user/:email', authController.makeUser);
+// Reset password
+router.post('/reset-password', resetPassword);
 
+// Update profile
+router.put('/profile', authenticateToken, updateProfile);
+
+// Get profile
+router.get('/profile', authenticateToken, getProfile);
+
+// Make admin
+router.put('/make-admin/:email', authenticateToken, makeAdmin);
+
+// Make driver
+router.put('/make-driver', authenticateToken, makeDriver);
+
+// Make user
+router.put('/make-user/:email', authenticateToken, makeUser);
+
+// Delete account
+router.delete('/delete-account', authenticateToken, deleteAccount);
+
+// Get all drivers
+router.get('/drivers', authenticateToken, getDrivers);
+
+// Update driver availability
+router.put('/driver/availability', authenticateToken, updateDriverAvailability);
 
 module.exports = router;

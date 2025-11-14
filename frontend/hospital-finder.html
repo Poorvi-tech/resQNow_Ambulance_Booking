@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hospital Finder | ResQNow</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script src="js/config.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #222;
+      animation: gradientBG 15s ease infinite;
+      background-size: 400% 400%;
+      min-height: 100vh;
+      position: relative;
+      overflow-y: auto;
+      font-size: 18px;
+    }
+    
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    /* Bubbles animation */
+    .bubbles {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+      top: 0;
+      left: 0;
+    }
+    
+    .bubble {
+      position: absolute;
+      bottom: -100px;
+      width: 80px;
+      height: 80px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      opacity: 0.5;
+      animation: rise 10s infinite ease-in;
+    }
+    
+    .bubble:nth-child(1) {
+      width: 80px;
+      height: 80px;
+      left: 10%;
+      animation-duration: 8s;
+      background: rgba(255, 107, 107, 0.3);
+    }
+    
+    .bubble:nth-child(2) {
+      width: 60px;
+      height: 60px;
+      left: 20%;
+      animation-duration: 5s;
+      animation-delay: 1s;
+      background: rgba(173, 216, 230, 0.3);
+    }
+    
+    .bubble:nth-child(3) {
+      width: 100px;
+      height: 100px;
+      left: 35%;
+      animation-duration: 7s;
+      animation-delay: 2s;
+      background: rgba(144, 238, 144, 0.3);
+    }
+    
+    .bubble:nth-child(4) {
+      width: 150px;
+      height: 150px;
+      left: 50%;
+      animation-duration: 11s;
+      animation-delay: 0s;
+      background: rgba(255, 182, 193, 0.3);
+    }
+    
+    .bubble:nth-child(5) {
+      width: 70px;
+      height: 70px;
+      left: 55%;
+      animation-duration: 6s;
+      animation-delay: 1s;
+      background: rgba(255, 255, 0, 0.3);
+    }
+    
+    .bubble:nth-child(6) {
+      width: 90px;
+      height: 90px;
+      left: 65%;
+      animation-duration: 8s;
+      background: rgba(153, 50, 204, 0.3);
+    }
+    
+    .bubble:nth-child(7) {
+      width: 70px;
+      height: 70px;
+      left: 75%;
+      animation-duration: 7s;
+      animation-delay: 3s;
+      background: rgba(255, 165, 0, 0.3);
+    }
+    
+    .bubble:nth-child(8) {
+      width: 130px;
+      height: 130px;
+      left: 80%;
+      animation-duration: 12s;
+      animation-delay: 2s;
+      background: rgba(0, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(9) {
+      width: 50px;
+      height: 50px;
+      left: 70%;
+      animation-duration: 5s;
+      animation-delay: 1s;
+      background: rgba(255, 192, 203, 0.3);
+    }
+    
+    .bubble:nth-child(10) {
+      width: 100px;
+      height: 100px;
+      left: 85%;
+      animation-duration: 9s;
+      animation-delay: 4s;
+      background: rgba(124, 252, 0, 0.3);
+    }
+    
+    @keyframes rise {
+      0% {
+        bottom: -100px;
+        transform: translateX(0);
+      }
+      50% {
+        transform: translateX(100px);
+      }
+      100% {
+        bottom: 1080px;
+        transform: translateX(-200px);
+      }
+    }
+
+    .navbar {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 25px 12%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      position: relative;
+      z-index: 100;
+    }
+
+    .navbar h1 {
+      color: #fff;
+      font-size: 36px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .navbar a {
+      text-decoration: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      padding: 15px 24px;
+      border-radius: 10px;
+      margin-left: 20px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(5px);
+      font-size: 20px;
+    }
+
+    .navbar a:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.05);
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    .finder-header {
+      text-align: center;
+      color: white;
+      margin-bottom: 30px;
+    }
+
+    .finder-header h2 {
+      font-size: 36px;
+      margin-bottom: 10px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .finder-header p {
+      font-size: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .search-section {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .search-section h3 {
+      color: #333;
+      margin-bottom: 25px;
+      font-size: 28px;
+      text-align: center;
+    }
+
+    .search-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-bottom: 25px;
+      align-items: end;
+    }
+
+    .search-group {
+      flex: 1;
+      min-width: 250px;
+    }
+
+    .search-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: #555;
+    }
+
+    .search-input, .search-select {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    .search-input:focus, .search-select:focus {
+      border-color: #667eea;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+      color: white;
+      padding: 12px 25px;
+      text-decoration: none;
+      font-weight: bold;
+      border-radius: 30px;
+      display: inline-block;
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+      background: linear-gradient(135deg, #ff8e53, #ff6b6b);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, #6c757d, #495057);
+      box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
+    }
+
+    .btn-secondary:hover {
+      box-shadow: 0 6px 20px rgba(108, 117, 125, 0.6);
+      background: linear-gradient(135deg, #495057, #6c757d);
+    }
+
+    .layout-container {
+      display: flex;
+      gap: 30px;
+      flex-wrap: wrap;
+    }
+
+    .map-container {
+      flex: 1;
+      min-width: 300px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .map-container h3 {
+      color: #333;
+      margin-bottom: 20px;
+      font-size: 24px;
+      text-align: center;
+    }
+
+    #map {
+      height: 500px;
+      border-radius: 15px;
+    }
+
+    .results-container {
+      flex: 1;
+      min-width: 300px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      max-height: 600px;
+      overflow-y: auto;
+    }
+
+    .results-container h3 {
+      color: #333;
+      margin-bottom: 20px;
+      font-size: 24px;
+      text-align: center;
+    }
+
+    .hospital-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .hospital-card {
+      background: rgba(240, 240, 255, 0.8);
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .hospital-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+      background: rgba(102, 126, 234, 0.1);
+    }
+
+    .hospital-card.selected {
+      background: rgba(102, 126, 234, 0.2);
+      border-color: #667eea;
+    }
+
+    .hospital-name {
+      font-size: 20px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .hospital-address {
+      color: #666;
+      margin-bottom: 8px;
+    }
+
+    .hospital-distance {
+      color: #ff6b6b;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .hospital-specialties {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .specialty-tag {
+      background: rgba(102, 126, 234, 0.2);
+      color: #333;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 14px;
+    }
+
+    .hospital-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .action-btn {
+      background: rgba(102, 126, 234, 0.1);
+      border: none;
+      padding: 8px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    .action-btn:hover {
+      background: rgba(102, 126, 234, 0.2);
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 50px;
+      color: #666;
+      font-size: 18px;
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .filter-group {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .filter-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: #555;
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 15px 5%;
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .navbar a {
+        margin: 10px 5px;
+        padding: 10px 15px;
+        font-size: 16px;
+      }
+      
+      .layout-container {
+        flex-direction: column;
+      }
+      
+      .search-controls {
+        flex-direction: column;
+      }
+      
+      #map {
+        height: 300px;
+      }
+    }
+
+    .dark-mode .navbar {
+      background: rgba(30, 30, 46, 0.7);
+    }
+
+    .dark-mode .navbar a {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff !important;
+    }
+
+    .dark-mode .navbar a:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .dark-mode .container {
+      color: #ffffff;
+    }
+
+    .dark-mode .finder-header h2 {
+      color: #ffffff !important;
+    }
+
+    .dark-mode .finder-header p {
+      color: #ffffff !important;
+    }
+
+    .dark-mode .search-section {
+      background: rgba(30, 30, 46, 0.9);
+      color: #ffffff;
+    }
+
+    .dark-mode .search-section h3 {
+      color: #ffffff !important;
+    }
+
+    .dark-mode .search-input,
+    .dark-mode .search-select {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff !important;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .dark-mode .btn {
+      color: #ffffff !important;
+    }
+
+    .dark-mode .btn-secondary {
+      color: #ffffff !important;
+    }
+
+    .dark-mode .map-container {
+      background: rgba(30, 30, 46, 0.9);
+      color: #ffffff;
+    }
+
+    .dark-mode .map-container h3 {
+      color: #ffffff !important;
+    }
+
+    .dark-mode .results-container {
+      background: rgba(30, 30, 46, 0.9);
+      color: #ffffff;
+    }
+
+    .dark-mode .results-container h3 {
+      color: #ffffff !important;
+    }
+
+    .dark-mode .hospital-card {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+    }
+
+    .dark-mode .hospital-card.selected {
+      background: rgba(102, 126, 234, 0.3);
+    }
+
+    .dark-mode .hospital-name {
+      color: #ffffff !important;
+    }
+
+    .dark-mode .hospital-address {
+      color: #ffffff !important;
+    }
+
+    .dark-mode .hospital-distance {
+      color: #ffeb3b !important;
+    }
+
+    .dark-mode .specialty-tag {
+      background: rgba(102, 126, 234, 0.3);
+      color: #ffffff !important;
+    }
+
+    .dark-mode .action-btn {
+      background: rgba(102, 126, 234, 0.3);
+      color: #ffffff !important;
+    }
+
+    /* Dark mode dropdown menu styles */
+    .dark-mode .dropdown-content {
+      background-color: #1e1e1e !important;
+      color: #ffffff !important;
+    }
+
+    .dark-mode .dropdown-content a {
+      color: #ffffff !important;
+      background-color: #1e1e1e !important;
+    }
+
+    .dark-mode .dropdown-content a:hover {
+      background-color: #333333 !important;
+      color: #ffeb3b !important;
+    }
+
+    .dark-mode .dropdown-btn {
+      background: rgba(255, 255, 255, 0.1) !important;
+      color: #ffffff !important;
+      border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+  </style>
+</head>
+<body>
+  <!-- Bubbles Container -->
+  <div class="bubbles">
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+  </div>
+  
+  <div class="navbar">
+    <h1> 🏥 ResQNow Hospital Finder </h1>
+    <div>
+      <a href="index.html">Home</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="finder-header">
+      <h2>🏥 Find Nearby Hospitals</h2>
+      <p>Locate hospitals, view specialties, and get directions for emergency care</p>
+    </div>
+    
+    <div class="search-section">
+      <h3>🔍 Search Hospitals</h3>
+      <div class="search-controls">
+        <div class="search-group">
+          <label for="location">Your Location</label>
+          <input type="text" id="location" class="search-input" placeholder="Enter your address or let us detect it" value="New Delhi, India">
+        </div>
+        
+        <div class="search-group">
+          <label for="specialty">Specialty (Optional)</label>
+          <select id="specialty" class="search-select">
+            <option value="">All Specialties</option>
+            <option value="cardiology">Cardiology</option>
+            <option value="neurology">Neurology</option>
+            <option value="orthopedics">Orthopedics</option>
+            <option value="pediatrics">Pediatrics</option>
+            <option value="emergency">Emergency Medicine</option>
+            <option value="icu">Intensive Care</option>
+          </select>
+        </div>
+        
+        <div class="search-group">
+          <label for="distance">Max Distance</label>
+          <select id="distance" class="search-select">
+            <option value="5">5 km</option>
+            <option value="10" selected>10 km</option>
+            <option value="20">20 km</option>
+            <option value="50">50 km</option>
+          </select>
+        </div>
+        
+        <button class="btn" onclick="searchHospitals()">Search</button>
+        <button class="btn btn-secondary" onclick="getCurrentLocation()">📍 Detect Location</button>
+      </div>
+      
+      <div class="filters">
+        <div class="filter-group">
+          <label>
+            <input type="checkbox" id="emergencyOnly"> 
+            Emergency Services Only
+          </label>
+        </div>
+        
+        <div class="filter-group">
+          <label>
+            <input type="checkbox" id="open247"> 
+            Open 24/7
+          </label>
+        </div>
+        
+        <div class="filter-group">
+          <label>
+            <input type="checkbox" id="icuAvailable"> 
+            ICU Available
+          </label>
+        </div>
+      </div>
+    </div>
+    
+    <div class="layout-container">
+      <div class="map-container">
+        <h3>🗺️ Hospital Locations</h3>
+        <div id="map"></div>
+      </div>
+      
+      <div class="results-container">
+        <h3>📋 Search Results</h3>
+        <div class="hospital-list" id="hospitalList">
+          <div class="no-results" id="noResults">
+            Search for hospitals to see results
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let map;
+    let markers = [];
+    let selectedHospital = null;
+    
+    // Initialize map
+    function initMap() {
+      map = L.map('map').setView([28.6139, 77.2090], 12); // Default to New Delhi
+      
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+      
+      // Add sample hospital markers
+      addSampleHospitals();
+    }
+    
+    // Add sample hospitals to map
+    function addSampleHospitals() {
+      const hospitals = [
+        {
+          id: 1,
+          name: "Apollo Hospital",
+          lat: 28.6239,
+          lng: 77.2190,
+          address: "123 Healthcare Ave, New Delhi",
+          distance: "2.4 km",
+          specialties: ["Cardiology", "Neurology", "Emergency"],
+          emergency: true,
+          open247: true,
+          icu: true
+        },
+        {
+          id: 2,
+          name: "Fortis Hospital",
+          lat: 28.6039,
+          lng: 77.1990,
+          address: "456 Medical Blvd, New Delhi",
+          distance: "3.8 km",
+          specialties: ["Orthopedics", "Pediatrics", "Emergency"],
+          emergency: true,
+          open247: true,
+          icu: true
+        },
+        {
+          id: 3,
+          name: "AIIMS Hospital",
+          lat: 28.5939,
+          lng: 77.2290,
+          address: "789 Research St, New Delhi",
+          distance: "5.2 km",
+          specialties: ["All Specialties", "Research", "Emergency"],
+          emergency: true,
+          open247: true,
+          icu: true
+        },
+        {
+          id: 4,
+          name: "Max Healthcare",
+          lat: 28.6339,
+          lng: 77.1890,
+          address: "101 Wellness Rd, New Delhi",
+          distance: "4.1 km",
+          specialties: ["Cardiology", "Orthopedics", "Emergency"],
+          emergency: true,
+          open247: false,
+          icu: true
+        },
+        {
+          id: 5,
+          name: "Medanta Hospital",
+          lat: 28.5839,
+          lng: 77.2390,
+          address: "202 Care Ln, New Delhi",
+          distance: "6.7 km",
+          specialties: ["Neurology", "Cardiology", "Emergency"],
+          emergency: true,
+          open247: true,
+          icu: true
+        }
+      ];
+      
+      hospitals.forEach(hospital => {
+        const marker = L.marker([hospital.lat, hospital.lng]).addTo(map);
+        marker.bindPopup(`
+          <b>${hospital.name}</b><br>
+          ${hospital.address}<br>
+          Distance: ${hospital.distance}<br>
+          <button onclick="selectHospital(${hospital.id})">View Details</button>
+        `);
+        marker.hospitalId = hospital.id;
+        markers.push(marker);
+      });
+    }
+    
+    // Search hospitals
+    function searchHospitals() {
+      const location = document.getElementById('location').value;
+      const specialty = document.getElementById('specialty').value;
+      const distance = document.getElementById('distance').value;
+      const emergencyOnly = document.getElementById('emergencyOnly').checked;
+      const open247 = document.getElementById('open247').checked;
+      const icuAvailable = document.getElementById('icuAvailable').checked;
+      
+      if (!location) {
+        alert('Please enter your location');
+        return;
+      }
+      
+      // In a real app, this would call an API to search for hospitals
+      // For now, we'll display sample data
+      displayHospitals();
+    }
+    
+    // Display hospitals in the list
+    function displayHospitals() {
+      const hospitalList = document.getElementById('hospitalList');
+      const noResults = document.getElementById('noResults');
+      
+      noResults.style.display = 'none';
+      
+      // Sample hospital data
+      const hospitals = [
+        {
+          id: 1,
+          name: "Apollo Hospital",
+          address: "123 Healthcare Ave, New Delhi",
+          distance: "2.4 km",
+          specialties: ["Cardiology", "Neurology", "Emergency Medicine"],
+          emergency: true,
+          open247: true,
+          icu: true,
+          rating: 4.8
+        },
+        {
+          id: 2,
+          name: "Fortis Hospital",
+          address: "456 Medical Blvd, New Delhi",
+          distance: "3.8 km",
+          specialties: ["Orthopedics", "Pediatrics", "Emergency Medicine"],
+          emergency: true,
+          open247: true,
+          icu: true,
+          rating: 4.6
+        },
+        {
+          id: 3,
+          name: "AIIMS Hospital",
+          address: "789 Research St, New Delhi",
+          distance: "5.2 km",
+          specialties: ["All Specialties", "Research", "Emergency Medicine"],
+          emergency: true,
+          open247: true,
+          icu: true,
+          rating: 4.9
+        },
+        {
+          id: 4,
+          name: "Max Healthcare",
+          address: "101 Wellness Rd, New Delhi",
+          distance: "4.1 km",
+          specialties: ["Cardiology", "Orthopedics", "Emergency Medicine"],
+          emergency: true,
+          open247: false,
+          icu: true,
+          rating: 4.5
+        },
+        {
+          id: 5,
+          name: "Medanta Hospital",
+          address: "202 Care Ln, New Delhi",
+          distance: "6.7 km",
+          specialties: ["Neurology", "Cardiology", "Emergency Medicine"],
+          emergency: true,
+          open247: true,
+          icu: true,
+          rating: 4.7
+        }
+      ];
+      
+      hospitalList.innerHTML = '';
+      
+      hospitals.forEach(hospital => {
+        const hospitalCard = document.createElement('div');
+        hospitalCard.className = 'hospital-card';
+        hospitalCard.innerHTML = `
+          <div class="hospital-name">${hospital.name}</div>
+          <div class="hospital-address">${hospital.address}</div>
+          <div class="hospital-distance">${hospital.distance} away</div>
+          <div>⭐ ${hospital.rating} Rating</div>
+          <div class="hospital-specialties">
+            ${hospital.specialties.map(s => `<span class="specialty-tag">${s}</span>`).join('')}
+          </div>
+          <div class="hospital-actions">
+            <button class="action-btn" onclick="viewHospital(${hospital.id})">View Details</button>
+            <button class="action-btn" onclick="getDirections(${hospital.id})">Directions</button>
+            <button class="action-btn" onclick="bookAmbulance(${hospital.id})">Book Ambulance</button>
+          </div>
+        `;
+        hospitalList.appendChild(hospitalCard);
+      });
+    }
+    
+    // Get current location
+    function getCurrentLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            document.getElementById('location').value = `Current Location (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+            map.setView([lat, lng], 13);
+          },
+          (error) => {
+            console.error('Error getting location:', error);
+            alert('Unable to detect location. Please enter manually.');
+          }
+        );
+      } else {
+        alert('Geolocation is not supported by this browser.');
+      }
+    }
+    
+    // Select hospital
+    function selectHospital(hospitalId) {
+      // Highlight selected hospital on map
+      markers.forEach(marker => {
+        if (marker.hospitalId === hospitalId) {
+          marker.openPopup();
+        }
+      });
+    }
+    
+    // View hospital details
+    function viewHospital(hospitalId) {
+      alert(`Viewing details for hospital ID: ${hospitalId}\nThis would show detailed information in a real application.`);
+    }
+    
+    // Get directions to hospital
+    function getDirections(hospitalId) {
+      alert(`Getting directions to hospital ID: ${hospitalId}\nThis would open navigation in a real application.`);
+    }
+    
+    // Book ambulance to hospital
+    function bookAmbulance(hospitalId) {
+      if (confirm('Book an ambulance to this hospital?')) {
+        window.location.href = 'book.html';
+      }
+    }
+    
+    // Logout function
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('userName');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('loggedIn');
+      window.location.href = 'index.html';
+    }
+    
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      initMap();
+    });
+  </script>
+</body>
+</html>

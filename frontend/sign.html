@@ -13,24 +13,162 @@
 
     body {
       font-family: 'Montserrat', sans-serif;
-      background: #f6f5f7;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       display: flex;
       flex-direction: column;
       min-height: 100vh;
+      animation: gradientBG 15s ease infinite;
+      background-size: 400% 400%;
+      overflow: hidden;
+      position: relative;
     }
-
+    
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    /* Bubbles animation */
+    .bubbles {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+      top: 0;
+      left: 0;
+    }
+    
+    .bubble {
+      position: absolute;
+      bottom: -100px;
+      width: 80px;
+      height: 80px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      opacity: 0.5;
+      animation: rise 10s infinite ease-in;
+    }
+    
+    .bubble:nth-child(1) {
+      width: 80px;
+      height: 80px;
+      left: 10%;
+      animation-duration: 8s;
+      background: rgba(255, 107, 107, 0.3);
+    }
+    
+    .bubble:nth-child(2) {
+      width: 60px;
+      height: 60px;
+      left: 20%;
+      animation-duration: 5s;
+      animation-delay: 1s;
+      background: rgba(173, 216, 230, 0.3);
+    }
+    
+    .bubble:nth-child(3) {
+      width: 100px;
+      height: 100px;
+      left: 35%;
+      animation-duration: 7s;
+      animation-delay: 2s;
+      background: rgba(144, 238, 144, 0.3);
+    }
+    
+    .bubble:nth-child(4) {
+      width: 150px;
+      height: 150px;
+      left: 50%;
+      animation-duration: 11s;
+      animation-delay: 0s;
+      background: rgba(255, 182, 193, 0.3);
+    }
+    
+    .bubble:nth-child(5) {
+      width: 70px;
+      height: 70px;
+      left: 55%;
+      animation-duration: 6s;
+      animation-delay: 1s;
+      background: rgba(255, 255, 0, 0.3);
+    }
+    
+    .bubble:nth-child(6) {
+      width: 90px;
+      height: 90px;
+      left: 65%;
+      animation-duration: 8s;
+      background: rgba(153, 50, 204, 0.3);
+    }
+    
+    .bubble:nth-child(7) {
+      width: 70px;
+      height: 70px;
+      left: 75%;
+      animation-duration: 7s;
+      animation-delay: 3s;
+      background: rgba(255, 165, 0, 0.3);
+    }
+    
+    .bubble:nth-child(8) {
+      width: 130px;
+      height: 130px;
+      left: 80%;
+      animation-duration: 12s;
+      animation-delay: 2s;
+      background: rgba(0, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(9) {
+      width: 50px;
+      height: 50px;
+      left: 70%;
+      animation-duration: 5s;
+      animation-delay: 1s;
+      background: rgba(255, 192, 203, 0.3);
+    }
+    
+    .bubble:nth-child(10) {
+      width: 100px;
+      height: 100px;
+      left: 85%;
+      animation-duration: 9s;
+      animation-delay: 4s;
+      background: rgba(124, 252, 0, 0.3);
+    }
+    
+    @keyframes rise {
+      0% {
+        bottom: -100px;
+        transform: translateX(0);
+      }
+      50% {
+        transform: translateX(100px);
+      }
+      100% {
+        bottom: 1080px;
+        transform: translateX(-200px);
+      }
+    }
+    
     header {
-      background: #fff;
+      background: rgba(255, 255, 255, 0.1);
       padding: 20px 10%;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid #ddd;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      z-index: 10;
+      position: relative;
     }
 
     header h1 {
-      color: #e60050;
-      font-size: 24px;
+      color: #fff;
+      font-size: 32px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
 
     .nav-right {
@@ -42,22 +180,46 @@
     .nav-right a {
       text-decoration: none;
       font-weight: 600;
-      color: #e60050;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 25px;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(5px);
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      font-size: 18px;
+    }
+    
+    .nav-right a:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     }
 
     .signup-container {
       display: flex;
       margin: 40px auto;
-      background: white;
-      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
       overflow: hidden;
       max-width: 900px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
       width: 90%;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      animation: float 6s ease-in-out infinite;
+      z-index: 10;
+      position: relative;
+    }
+    
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
     }
 
     .left-panel {
-      background: linear-gradient(to bottom right, #a70606, #c962a3);
+      background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
       color: white;
       flex: 1;
       padding: 40px 20px;
@@ -65,17 +227,29 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
+      text-align: center;
+      animation: colorChange 10s infinite alternate;
+    }
+    
+    @keyframes colorChange {
+      0% { background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%); }
+      25% { background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); }
+      50% { background: linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%); }
+      75% { background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%); }
+      100% { background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%); }
     }
 
     .left-panel h2 {
       font-size: 24px;
       margin-bottom: 20px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
 
     .left-panel p {
       font-size: 14px;
       text-align: center;
       margin-bottom: 30px;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
     }
 
     .left-panel button {
@@ -86,23 +260,27 @@
       border-radius: 30px;
       cursor: pointer;
       font-weight: bold;
-      transition: 0.3s ease;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(5px);
     }
 
     .left-panel button:hover {
-      background: #fff;
-      color: #a70606;
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
     }
 
     .form-box {
       flex: 1;
       padding: 40px 30px;
+      background: rgba(255, 255, 255, 0.9);
     }
 
     .form-box h2 {
       font-size: 22px;
       margin-bottom: 20px;
       text-align: center;
+      color: #333;
     }
 
     .social-icons {
@@ -114,41 +292,70 @@
       margin: 0 10px;
       cursor: pointer;
       color: #555;
+      font-size: 18px;
+      transition: all 0.3s ease;
+      border-radius: 50%;
+      padding: 10px;
+      background: #f0f0f0;
+    }
+    
+    .social-icons i:hover {
+      transform: translateY(-3px);
+      background: #e0e0e0;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
 
     form input {
       width: 100%;
       padding: 12px;
       margin: 10px 0;
-      background: #eee;
+      background: #f0f0f0;
       border: none;
-      border-radius: 5px;
+      border-radius: 25px;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+    
+    form input:focus {
+      outline: none;
+      border-color: #ff6b6b;
+      background: #fff;
+      box-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
     }
 
     form button {
       width: 100%;
       padding: 12px;
       margin-top: 10px;
-      background: linear-gradient(to right, #c962a3, #a70606);
+      background: linear-gradient(135deg, #ff6b6b, #ff8e53);
       color: #fff;
       border: none;
       border-radius: 30px;
       font-weight: bold;
       cursor: pointer;
-      transition: 0.3s ease;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
     }
 
     form button:hover {
-      opacity: 0.9;
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+      background: linear-gradient(135deg, #ff8e53, #ff6b6b);
+    }
+    
+    form button:active {
+      transform: translateY(1px);
     }
 
     footer {
-      background: #f1f1f1;
+      background: rgba(0, 0, 0, 0.2);
       text-align: center;
       padding: 15px;
       margin-top: auto;
       font-size: 14px;
-      color: #777;
+      color: #fff;
+      z-index: 10;
+      position: relative;
     }
 
     /* Responsive Design */
@@ -191,33 +398,57 @@
         font-size: 13px;
       }
     }
-.nav-left a {
-  text-decoration: none;
-}
+    
+    .nav-left a {
+      text-decoration: none;
+    }
 
-.nav-left h1 {
-  margin: 0;
-  font-size: 20px;
-  color: #e60050;
-  white-space: nowrap;
-  border-bottom: none; /* Ensure no underline */
-}
-
-
+    .nav-left h1 {
+      margin: 0;
+      font-size: 20px;
+      color: #fff;
+      white-space: nowrap;
+      border-bottom: none;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    /* Pulsing animation for important elements */
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    
+    .pulse {
+      animation: pulse 2s infinite;
+    }
   </style>
 </head>
 <body>
+  <!-- Bubbles Container -->
+  <div class="bubbles">
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+  </div>
+  
   <header>
      <div class="nav-left">
        <a href="index.html"><h1> 🚑 ResQNow </h1></a>
   </div>
     <div class="nav-right">
       <a href="index.html">Home</a>
-      
     </div>
   </header>
 
-  <div class="signup-container">
+  <div class="signup-container pulse">
     <div class="left-panel">
       <h2>BOOK AN AMBULANCE</h2>
       <p>To continue with us please login with your personal info</p>
@@ -244,6 +475,7 @@
   <footer>© 2025 ResQNow. All rights reserved.</footer>
 
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="js/config.js"></script>
   <script>
     document.getElementById("register-form").addEventListener("submit", async function (e) {
       e.preventDefault();
@@ -254,13 +486,12 @@
 
       try {
         const res = await axios.post(
-          "https://resqnow-ambulance-booking.onrender.com/api/auth/register",
+          `${API_BASE_URL}/auth/register`,
           { name, email, mobile, password }
         );
         document.getElementById("registerMessage").innerText = res.data.msg;
-        alert("Account created. Please verify OTP.");
-        localStorage.setItem("tempEmail", email);
-        window.location.href = "otp.html";
+        alert("Account created successfully!");
+        window.location.href = "login.html";
       } catch (err) {
         document.getElementById("registerMessage").innerText =
           err.response?.data?.msg || "Registration failed. Try again.";

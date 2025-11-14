@@ -12,51 +12,199 @@
       margin: 0;
       padding: 0;
     }
+    
     body {
-      background: #f6f5f7;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       font-family: "Montserrat", sans-serif;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      animation: gradientBG 15s ease infinite;
+      background-size: 400% 400%;
+      overflow: hidden;
+      position: relative;
     }
+    
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    /* Bubbles animation */
+    .bubbles {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+      top: 0;
+      left: 0;
+    }
+    
+    .bubble {
+      position: absolute;
+      bottom: -100px;
+      width: 80px;
+      height: 80px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      opacity: 0.5;
+      animation: rise 10s infinite ease-in;
+    }
+    
+    .bubble:nth-child(1) {
+      width: 80px;
+      height: 80px;
+      left: 10%;
+      animation-duration: 8s;
+      background: rgba(255, 107, 107, 0.3);
+    }
+    
+    .bubble:nth-child(2) {
+      width: 60px;
+      height: 60px;
+      left: 20%;
+      animation-duration: 5s;
+      animation-delay: 1s;
+      background: rgba(173, 216, 230, 0.3);
+    }
+    
+    .bubble:nth-child(3) {
+      width: 100px;
+      height: 100px;
+      left: 35%;
+      animation-duration: 7s;
+      animation-delay: 2s;
+      background: rgba(144, 238, 144, 0.3);
+    }
+    
+    .bubble:nth-child(4) {
+      width: 150px;
+      height: 150px;
+      left: 50%;
+      animation-duration: 11s;
+      animation-delay: 0s;
+      background: rgba(255, 182, 193, 0.3);
+    }
+    
+    .bubble:nth-child(5) {
+      width: 70px;
+      height: 70px;
+      left: 55%;
+      animation-duration: 6s;
+      animation-delay: 1s;
+      background: rgba(255, 255, 0, 0.3);
+    }
+    
+    .bubble:nth-child(6) {
+      width: 90px;
+      height: 90px;
+      left: 65%;
+      animation-duration: 8s;
+      background: rgba(153, 50, 204, 0.3);
+    }
+    
+    .bubble:nth-child(7) {
+      width: 70px;
+      height: 70px;
+      left: 75%;
+      animation-duration: 7s;
+      animation-delay: 3s;
+      background: rgba(255, 165, 0, 0.3);
+    }
+    
+    .bubble:nth-child(8) {
+      width: 130px;
+      height: 130px;
+      left: 80%;
+      animation-duration: 12s;
+      animation-delay: 2s;
+      background: rgba(0, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(9) {
+      width: 50px;
+      height: 50px;
+      left: 70%;
+      animation-duration: 5s;
+      animation-delay: 1s;
+      background: rgba(255, 192, 203, 0.3);
+    }
+    
+    .bubble:nth-child(10) {
+      width: 100px;
+      height: 100px;
+      left: 85%;
+      animation-duration: 9s;
+      animation-delay: 4s;
+      background: rgba(124, 252, 0, 0.3);
+    }
+    
+    @keyframes rise {
+      0% {
+        bottom: -100px;
+        transform: translateX(0);
+      }
+      50% {
+        transform: translateX(100px);
+      }
+      100% {
+        bottom: 1080px;
+        transform: translateX(-200px);
+      }
+    }
+    
     header, footer {
-      background: #fff;
+      background: rgba(255, 255, 255, 0.1);
       padding: 20px 10%;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      z-index: 10;
+      position: relative;
     }
+    
     header h1, footer p {
-      color: #e60050;
+      color: #fff;
       font-weight: bold;
-      font-size: 20px;
+      font-size: 28px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
+    
     nav.nav-right {
       display: flex;
       gap: 15px;
       align-items: center;
     }
+    
     nav.nav-right a {
-      color: #e60050;
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 500;
-      padding: 8px 16px;
-      border: 2px solid #e60050;
-      border-radius: 20px;
-      transition: 0.3s ease;
-    }
-    nav.nav-right a:hover {
-      background: #e60050;
       color: #fff;
+      text-decoration: none;
+      font-size: 18px;
+      font-weight: 500;
+      padding: 12px 20px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 25px;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(5px);
+      background: rgba(255, 255, 255, 0.1);
     }
+    
+    nav.nav-right a:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    
     .container {
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 14px 28px rgba(0,0,0,0.25),
-                  0 10px 10px rgba(0,0,0,0.22);
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
       overflow: hidden;
       width: 768px;
       max-width: 100%;
@@ -64,7 +212,18 @@
       margin: 40px auto;
       display: flex;
       position: relative;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      animation: float 6s ease-in-out infinite;
+      z-index: 10;
     }
+    
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+    }
+    
     .form-container {
       width: 50%;
       padding: 50px;
@@ -72,99 +231,267 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
+      background: rgba(255, 255, 255, 0.9);
     }
+    
     .overlay-container {
       width: 50%;
-      background: linear-gradient(to right, #c962a3, #a70606);
+      background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
       color: #fff;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       padding: 40px;
+      text-align: center;
+      animation: colorChange 10s infinite alternate;
     }
+    
+    @keyframes colorChange {
+      0% { background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%); }
+      25% { background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); }
+      50% { background: linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%); }
+      75% { background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%); }
+      100% { background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%); }
+    }
+    
     form {
       width: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
-    input {
-      background: #eee;
-      border: none;
-      padding: 12px 15px;
-      margin: 8px 0;
-      width: 100%;
-      border-radius: 5px;
+    
+    h1 {
+      color: #333;
+      margin-bottom: 25px;
+      font-size: 32px;
     }
+    
+    input {
+      background: #f0f0f0;
+      border: none;
+      padding: 16px 20px;
+      margin: 12px 0;
+      width: 100%;
+      border-radius: 25px;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+      font-size: 18px;
+    }
+    
+    input:focus {
+      outline: none;
+      border-color: #ff6b6b;
+      background: #fff;
+      box-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+    }
+    
     button {
-      border-radius: 20px;
-      border: 1px solid #ff1a1a;
-      background: linear-gradient(to right, #c962a3, #a70606);
+      border-radius: 25px;
+      border: none;
+      background: linear-gradient(135deg, #ff6b6b, #ff8e53);
       color: #fff;
-      font-size: 12px;
+      font-size: 20px;
       font-weight: bold;
-      padding: 12px 45px;
+      padding: 16px 50px;
       letter-spacing: 1px;
       text-transform: uppercase;
       cursor: pointer;
-      margin-top: 10px;
+      margin-top: 15px;
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
     }
+    
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+      background: linear-gradient(135deg, #ff8e53, #ff6b6b);
+    }
+    
+    button:active {
+      transform: translateY(1px);
+    }
+    
     .overlay-container h1 {
       margin-bottom: 10px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
+    
     .overlay-container p {
       margin-bottom: 20px;
       text-align: center;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
     }
+    
     .overlay-container a {
       color: #fff;
-      text-decoration: underline;
+      text-decoration: none;
       font-weight: bold;
+      padding: 10px 20px;
+      border-radius: 25px;
+      background: rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+      border: 2px solid rgba(255, 255, 255, 0.5);
     }
+    
+    .overlay-container a:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.05);
+    }
+    
     footer {
       margin-top: auto;
       text-align: center;
+      background: rgba(0, 0, 0, 0.2);
+      color: white;
+      z-index: 10;
+      position: relative;
     }
-
+    
+    @media (max-width: 1024px) {
+      .container {
+        max-width: 95%;
+        padding: 20px;
+      }
+      
+      .form-container, .overlay-container {
+        padding: 35px;
+      }
+      
+      h1 {
+        font-size: 32px;
+      }
+      
+      input {
+        font-size: 18px;
+        padding: 14px;
+      }
+      
+      button {
+        font-size: 18px;
+        padding: 14px;
+      }
+    }
+    
     @media (max-width: 768px) {
       .container {
         flex-direction: column;
         width: 90%;
+        padding: 15px;
       }
       .form-container, .overlay-container {
         width: 100%;
         padding: 30px;
       }
+      
+      h1 {
+        font-size: 28px;
+      }
+      
+      input {
+        font-size: 16px;
+        padding: 12px;
+      }
+      
+      button {
+        font-size: 16px;
+        padding: 12px;
+      }
+      
+      .nav-left h1 {
+        font-size: 24px;
+      }
     }
-
-.nav-left a {
-  text-decoration: none;
-}
-
-.nav-left h1 {
-  margin: 0;
-  font-size: 20px;
-  color: #e60050;
-  white-space: nowrap;
-  border-bottom: none; /* Ensure no underline */
-}
-
-
+    
+    @media (max-width: 480px) {
+      .container {
+        width: 95%;
+        padding: 10px;
+      }
+      
+      .form-container, .overlay-container {
+        padding: 25px;
+      }
+      
+      h1 {
+        font-size: 24px;
+      }
+      
+      input {
+        font-size: 14px;
+        padding: 10px;
+      }
+      
+      button {
+        font-size: 14px;
+        padding: 10px;
+      }
+      
+      .nav-left h1 {
+        font-size: 20px;
+      }
+      
+      footer {
+        font-size: 12px;
+      }
+    }
+    
+    .nav-left a {
+      text-decoration: none;
+    }
+    
+    .nav-left h1 {
+      margin: 0;
+      font-size: 20px;
+      color: #fff;
+      white-space: nowrap;
+      border-bottom: none;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    /* Pulsing animation for important elements */
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+    
+    /* Glowing effect */
+    .glow {
+      box-shadow: 0 0 15px rgba(255, 107, 107, 0.7);
+    }
   </style>
 </head>
 <body>
+  <!-- Bubbles Container -->
+  <div class="bubbles">
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+  </div>
+  
   <header>
     <div class="nav-left">
        <a href="index.html"><h1> 🚑 ResQNow </h1></a>
   </div>
     <nav class="nav-right">
       <a href="index.html">Home</a>
-     
     </nav>
   </header>
 
-  <div class="container">
+  <div class="container pulse">
     <!-- Login Form -->
     <div class="form-container">
       <form id="login-form">
@@ -190,6 +517,7 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="js/config.js"></script>
   <script>
     document.getElementById("login-form").addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -197,7 +525,7 @@
       const password = document.getElementById("login-password").value.trim();
 
       try {
-        const res = await axios.post("https://resqnow-ambulance-booking.onrender.com/api/auth/login", { email, password });
+        const res = await axios.post(`${API_BASE_URL}/auth/login`, { email, password });
         localStorage.setItem("token", res.data.token);
         localStorage.setItem("loggedIn", "true");
         localStorage.setItem("userName", res.data.user.name);
