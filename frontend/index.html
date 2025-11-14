@@ -230,15 +230,34 @@ header {
   padding: 12px 28px;
   text-decoration: none;
   display: block;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
+  border-radius: 4px;
+  margin: 4px 8px;
 }
 
 .dropdown-content a:hover {
   background-color: #f1f1f1;
+  transform: translateX(5px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .dropdown-btn:hover {
   background-color: #f4f4f4;
+}
+
+.dropdown-content {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  border-radius: 12px;
+  padding: 8px 0;
+  animation: dropdownFade 0.3s ease;
+}
+
+@keyframes dropdownFade {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Mobile Fix: Keep header in one line */
@@ -929,43 +948,57 @@ function toggleDropdownMenu(event) {
   const isVisible = dropdown.style.display === 'block';
   
   // Close all dropdowns first
-  document.querySelectorAll('.dropdown-content').forEach(d => d.style.display = 'none');
+  document.querySelectorAll('.dropdown-content').forEach(d => {
+    // Don't close the current dropdown if it's already open
+    if (d !== dropdown) {
+      d.style.display = 'none';
+    }
+  });
   
   // Toggle current dropdown
   dropdown.style.display = isVisible ? 'none' : 'block';
 }
 
-// Close dropdowns when clicking outside
-document.addEventListener('click', function() {
-  document.querySelectorAll('.dropdown-content').forEach(dropdown => {
-    dropdown.style.display = 'none';
-  });
-});
-
-// Prevent hamburger toggle from closing instantly
-document.querySelector('.hamburger').addEventListener('click', function(event) {
+// Toggle user dropdown
+function toggleDropdown(event) {
   event.stopPropagation();
-});
-
-// Prevent nav from closing on click inside it
-document.getElementById('mainMenu').addEventListener('click', function(event) {
-  event.stopPropagation();
-});
-
-// Close both menus if clicked outside
-document.addEventListener('click', function(event) {
   const userMenu = document.getElementById("userDropdownMenu");
-  const dropdownBtn = document.querySelector('.dropdown-btn');
-  const hamburger = document.querySelector('.hamburger');
-  const navMenu = document.getElementById('mainMenu');
+  if (!userMenu) return;
+  
+  const isVisible = userMenu.style.display === 'block';
+  
+  // Close all dropdowns first
+  document.querySelectorAll('.dropdown-content').forEach(d => {
+    // Don't close the user menu if it's already open
+    if (d !== userMenu) {
+      d.style.display = 'none';
+    }
+  });
+  
+  // Toggle user dropdown
+  userMenu.style.display = isVisible ? 'none' : 'block';
+}
 
-  // Dropdown close
-  if (userMenu && dropdownBtn && !userMenu.contains(event.target) && !dropdownBtn.contains(event.target)) {
-    userMenu.style.display = "none";
+// Close all dropdowns when clicking outside
+document.addEventListener('click', function(event) {
+  // Check if click is inside any dropdown button or content
+  const isInsideDropdown = event.target.closest('.dropdown') || 
+                          event.target.closest('#userDropdownMenu') ||
+                          event.target.classList.contains('dropdown-btn');
+  
+  if (!isInsideDropdown) {
+    document.querySelectorAll('.dropdown-content').forEach(dropdown => {
+      dropdown.style.display = 'none';
+    });
   }
-
-  // Hamburger menu close
-  if (navMenu.classList.contains("show") && !navMenu.contains(event.target) && !hamburger.contains(event.target)) {
+  
+  // Handle hamburger menu
+  const navMenu = document.getElementById('mainMenu');
+  const hamburger = document.querySelector('.hamburger');
+  if (navMenu && hamburger && 
+      navMenu.classList.contains("show") && 
+      !navMenu.contains(event.target) && 
+      !hamburger.contains(event.target)) {
     navMenu.classList.remove("show");
   }
 });
@@ -1075,7 +1108,19 @@ document.addEventListener('click', function(event) {
     event.stopPropagation(); // Prevent the document click listener from firing immediately
     const menu = document.getElementById("userDropdownMenu");
     if (!menu) return;
-    menu.style.display = menu.style.display === "block" ? "none" : "block";
+    
+    const isVisible = menu.style.display === "block";
+    
+    // Close all dropdowns first
+    document.querySelectorAll('.dropdown-content').forEach(d => {
+      // Don't close the user menu if it's already open
+      if (d !== menu) {
+        d.style.display = 'none';
+      }
+    });
+    
+    // Toggle user dropdown
+    menu.style.display = isVisible ? "none" : "block";
   }
 
 
@@ -1087,6 +1132,63 @@ document.addEventListener('click', function(event) {
 
   // Run the function on page load
   document.addEventListener('DOMContentLoaded', updateNavbarAuthLinks);
+  
+  // Add event listeners for interactive More dropdown options
+  document.addEventListener('DOMContentLoaded', function() {
+    // Emergency Simulator
+    const emergencySimulator = document.getElementById('emergencySimulator');
+    if (emergencySimulator) {
+      emergencySimulator.addEventListener('click', function(e) {
+        e.preventDefault();
+        alert('🚨 Emergency Simulator will help you prepare for emergency situations!');
+      });
+    }
+    
+    // Health Tips
+    const healthTips = document.getElementById('healthTips');
+    if (healthTips) {
+      healthTips.addEventListener('click', function(e) {
+        e.preventDefault();
+        alert('💡 Health Tips: Stay hydrated, exercise regularly, and get enough sleep!');
+      });
+    }
+    
+    // First Aid Guide
+    const firstAid = document.getElementById('firstAid');
+    if (firstAid) {
+      firstAid.addEventListener('click', function(e) {
+        e.preventDefault();
+        alert('🩹 First Aid Guide: Learn basic first aid techniques to help in emergencies!');
+      });
+    }
+    
+    // Response Time Tracker
+    const responseTime = document.getElementById('responseTime');
+    if (responseTime) {
+      responseTime.addEventListener('click', function(e) {
+        e.preventDefault();
+        alert('⏱️ Live Response Tracker: Our average response time is under 15 minutes!');
+      });
+    }
+    
+    // Ambulance Game
+    const ambulanceGame = document.getElementById('ambulanceGame');
+    if (ambulanceGame) {
+      ambulanceGame.addEventListener('click', function(e) {
+        e.preventDefault();
+        alert('🎮 Ambulance Challenge: Test your emergency response knowledge!');
+      });
+    }
+    
+    // Medical Quiz
+    const medicalQuiz = document.getElementById('medicalQuiz');
+    if (medicalQuiz) {
+      medicalQuiz.addEventListener('click', function(e) {
+        e.preventDefault();
+        alert('🧠 Medical Quiz: Challenge yourself with medical knowledge questions!');
+      });
+    }
+  });
   
   // Hide loader when page is fully loaded
   window.addEventListener('load', () => {
