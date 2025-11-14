@@ -14,10 +14,142 @@ html { scroll-behavior: smooth; }
 body {
   margin: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: white;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: #222;
   max-width: 100%;
   overflow-x: hidden;
+  animation: gradientBG 15s ease infinite;
+  background-size: 400% 400%;
+}
+
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Bubbles animation */
+.bubbles {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+  top: 0;
+  left: 0;
+}
+
+.bubble {
+  position: absolute;
+  bottom: -100px;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  opacity: 0.5;
+  animation: rise 10s infinite ease-in;
+}
+
+.bubble:nth-child(1) {
+  width: 40px;
+  height: 40px;
+  left: 10%;
+  animation-duration: 8s;
+  background: rgba(255, 107, 107, 0.3);
+}
+
+.bubble:nth-child(2) {
+  width: 20px;
+  height: 20px;
+  left: 20%;
+  animation-duration: 5s;
+  animation-delay: 1s;
+  background: rgba(173, 216, 230, 0.3);
+}
+
+.bubble:nth-child(3) {
+  width: 50px;
+  height: 50px;
+  left: 35%;
+  animation-duration: 7s;
+  animation-delay: 2s;
+  background: rgba(144, 238, 144, 0.3);
+}
+
+.bubble:nth-child(4) {
+  width: 80px;
+  height: 80px;
+  left: 50%;
+  animation-duration: 11s;
+  animation-delay: 0s;
+  background: rgba(255, 182, 193, 0.3);
+}
+
+.bubble:nth-child(5) {
+  width: 35px;
+  height: 35px;
+  left: 55%;
+  animation-duration: 6s;
+  animation-delay: 1s;
+  background: rgba(255, 255, 0, 0.3);
+}
+
+.bubble:nth-child(6) {
+  width: 45px;
+  height: 45px;
+  left: 65%;
+  animation-duration: 8s;
+  background: rgba(153, 50, 204, 0.3);
+}
+
+.bubble:nth-child(7) {
+  width: 25px;
+  height: 25px;
+  left: 75%;
+  animation-duration: 7s;
+  animation-delay: 3s;
+  background: rgba(255, 165, 0, 0.3);
+}
+
+.bubble:nth-child(8) {
+  width: 65px;
+  height: 65px;
+  left: 80%;
+  animation-duration: 12s;
+  animation-delay: 2s;
+  background: rgba(0, 255, 255, 0.3);
+}
+
+.bubble:nth-child(9) {
+  width: 30px;
+  height: 30px;
+  left: 70%;
+  animation-duration: 5s;
+  animation-delay: 1s;
+  background: rgba(255, 192, 203, 0.3);
+}
+
+.bubble:nth-child(10) {
+  width: 50px;
+  height: 50px;
+  left: 85%;
+  animation-duration: 9s;
+  animation-delay: 4s;
+  background: rgba(124, 252, 0, 0.3);
+}
+
+@keyframes rise {
+  0% {
+    bottom: -100px;
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(100px);
+  }
+  100% {
+    bottom: 1080px;
+    transform: translateX(-200px);
+  }
 }
 
 header {
@@ -25,13 +157,14 @@ header {
   justify-content: space-between;
   align-items: center;
   padding: 15px 5%;
-  background-color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   flex-wrap: nowrap;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   position: relative;
   overflow: visible;
   z-index: 1000;
+  backdrop-filter: blur(10px);
 }
 
 .nav-left h1 {
@@ -137,7 +270,24 @@ header {
   justify-content: space-between;
   align-items: center;
   padding: 60px 10%;
-  background-color: white;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  margin: 30px 5%;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  animation: fadeInUp 1s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .hero .content {
@@ -150,27 +300,64 @@ header {
   font-size: 36px;
   margin-bottom: 10px;
   min-height: 48px;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  animation: textGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes textGlow {
+  from { text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #e60050, 0 0 20px #e60050; }
+  to { text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #e60050, 0 0 40px #e60050; }
 }
 
 .hero p {
   font-size: 18px;
   margin-bottom: 20px;
-  color: #444;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
 .btn {
-  background-color: #e60050;
+  background: linear-gradient(45deg, #e60050, #ff6b6b);
   color: white;
-  padding: 12px 24px;
+  padding: 15px 30px;
   text-decoration: none;
   font-weight: bold;
-  border-radius: 6px;
+  border-radius: 50px;
   display: inline-block;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(230, 0, 80, 0.3);
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
 }
 
 .btn:hover {
-  background-color: #c80045;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(230, 0, 80, 0.4);
+  background: linear-gradient(45deg, #ff6b6b, #e60050);
+}
+
+.btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 10px rgba(230, 0, 80, 0.3);
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: 0.5s;
+}
+
+.btn:hover::before {
+  left: 100%;
 }
 
 .hero img {
@@ -180,14 +367,45 @@ header {
 
 section {
   padding: 60px 10%;
-  background-color: white;
+  background: rgba(255, 255, 255, 0.85);
+  margin: 20px 5%;
+  border-radius: 20px;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  animation: slideIn 0.8s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .section-title {
   text-align: center;
   font-size: 32px;
   margin-bottom: 30px;
-  color: #222;
+  color: #e60050;
+  position: relative;
+  padding-bottom: 15px;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 4px;
+  background: linear-gradient(90deg, #e60050, #ff6b6b);
+  border-radius: 2px;
 }
 
 .section-content {
@@ -253,18 +471,34 @@ li {
 }
 
 .stat-item {
-  background-color: #fff;
-  border: 1px solid #ddd;
-  padding: 20px;
-  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(230, 0, 80, 0.2);
+  padding: 25px;
+  border-radius: 15px;
   text-align: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  transform: translateY(0);
+  animation: float 3s ease-in-out infinite;
+}
+
+.stat-item:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 12px 30px rgba(230, 0, 80, 0.2);
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
 }
 
 .stat-item strong {
-  font-size: 20px;
+  font-size: 24px;
   display: block;
   margin-bottom: 5px;
   color: #e60050;
+  text-shadow: 0 2px 4px rgba(230, 0, 80, 0.2);
 }
 
 @media (max-width: 600px) {
@@ -284,8 +518,13 @@ li {
 footer {
   text-align: center;
   padding: 40px 10%;
-  background-color: #f4f4f4;
-  color: #555;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  margin: 20px 5%;
+  border-radius: 20px;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
 @media (max-width: 480px) {
@@ -322,18 +561,31 @@ footer {
 }
 
 .review-card {
-  background-color: #fff;
+  background: rgba(255, 255, 255, 0.9);
   border-radius: 16px;
   box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-  padding: 20px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  padding: 25px;
+  transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  border: 1px solid rgba(230, 0, 80, 0.1);
+  backdrop-filter: blur(5px);
 }
 
 .review-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+  transform: translateY(-12px);
+  box-shadow: 0 15px 35px rgba(230, 0, 80, 0.2);
+  background: rgba(255, 255, 255, 1);
+}
+
+.review-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, #e60050, #ff6b6b);
 }
 
 .review-text {
@@ -444,8 +696,73 @@ footer {
 }
 </style>
 
+<style>
+  /* Loading animation */
+  .loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+  }
+  
+  .loader.hidden {
+    opacity: 0;
+    visibility: hidden;
+  }
+  
+  .loader-content {
+    text-align: center;
+  }
+  
+  .loader-spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+    margin: 0 auto 20px;
+  }
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  
+  .loader-text {
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+</style>
+
 </head>
 <body>
+  <div class="loader">
+    <div class="loader-content">
+      <div class="loader-spinner"></div>
+      <div class="loader-text">ResQNow Loading...</div>
+    </div>
+  </div>
+  <div class="bubbles">
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+  </div>
   <header class="reveal">
     <div class="nav-left">
         <a href="index.html"><h1> 🚑 ResQNow </h1></a>
@@ -770,6 +1087,47 @@ document.addEventListener('click', function(event) {
 
   // Run the function on page load
   document.addEventListener('DOMContentLoaded', updateNavbarAuthLinks);
+  
+  // Hide loader when page is fully loaded
+  window.addEventListener('load', () => {
+    const loader = document.querySelector('.loader');
+    if (loader) {
+      setTimeout(() => {
+        loader.classList.add('hidden');
+      }, 1000);
+    }
+  });
+  
+  // Add parallax effect to hero section
+  document.addEventListener('mousemove', (e) => {
+    const hero = document.querySelector('.hero');
+    const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+    const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+    hero.style.transform = `translate(${xAxis}px, ${yAxis}px)`;
+  });
+  
+  // Add pulse animation to buttons
+  const buttons = document.querySelectorAll('.btn');
+  buttons.forEach(button => {
+    button.addEventListener('mouseenter', () => {
+      button.style.animation = 'pulse 0.5s';
+    });
+    
+    button.addEventListener('animationend', () => {
+      button.style.animation = '';
+    });
+  });
+  
+  // Add CSS for pulse animation
+  const style = document.createElement('style');
+  style.innerHTML = `
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+  `;
+  document.head.appendChild(style);
 </script>
 
 </body>
