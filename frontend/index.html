@@ -1,18 +1,735 @@
-      <div class="dropdown">
-        <button class="dropdown-btn" onclick="toggleDropdownMenu(event)">More ▼</button>
-        <div class="dropdown-content">
-          <a href="#why">Why Us?</a>
-          <a href="#faq">FAQs</a>
-          <a href="#contact">Contact</a>
-          <a href="sample.html" id="adminPanelLink" style="display:none;">Admin Panel</a>
-          <a href="medical-assistant.html">Medical Assistant</a>
-          <a href="hospital-finder.html">Hospital Finder</a>
-          <a href="health-check.html">🔧 Backend Health Check</a>
-          <a href="#" id="emergencySimulator">🚑 Emergency Simulator</a>
-          <a href="#" id="healthTips">💡 Health Tips</a>
-          <a href="#" id="firstAid">🩹 First Aid Guide</a>
-          <a href="#" id="responseTime">⏱️ Live Response Tracker</a>
-          <a href="#" id="ambulanceGame">🎮 Ambulance Challenge</a>
-          <a href="#" id="medicalQuiz">🧠 Medical Quiz</a>
-        </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ambulance Booking</title>
+  <style>
+html { scroll-behavior: smooth; }
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: white;
+  color: #222;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 5%;
+  background-color: #ffffff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  flex-wrap: nowrap;
+  border-bottom: 1px solid #ddd;
+  position: relative;
+  overflow: visible;
+  z-index: 1000;
+}
+
+.nav-left h1 {
+  margin: 0;
+  font-size: 20px;
+  color: #e60050;
+  white-space: nowrap;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: nowrap;
+  overflow-x: visible;
+}
+
+.nav-right a,
+.nav-right span,
+.dropdown-btn {
+  color: #222;
+  text-decoration: none;
+  background-color: transparent;
+  padding: 6px 10px;
+  border-radius: 5px;
+  font-weight: 500;
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+.nav-right a:hover {
+  background-color: #f4f4f4;
+}
+
+.phone-number {
+  font-weight: bold;
+  color: #e60050;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #fff;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+  z-index: 9999;
+  position: absolute;
+  border-radius: 6px;
+  top: 100%;
+  right: 0;
+  left: auto;
+}
+
+.dropdown-content a {
+  color: #333;
+  padding: 12px 28px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {
+  background-color: #f1f1f1;
+}
+
+/* Mobile Fix: Keep header in one line */
+@media (max-width: 768px) {
+  header {
+    padding: 8px 4%;
+  }
+
+  .nav-left h1 {
+    font-size: 16px;
+  }
+
+  .nav-right a,
+  .nav-right span,
+  .dropdown-btn {
+    font-size: 12px;
+    padding: 4px 8px;
+  }
+
+  .dropdown-content a {
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+}
+
+.hero {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  padding: 60px 10%;
+  background-color: white;
+}
+
+.hero .content {
+  flex: 1;
+  min-width: 280px;
+}
+
+/* ✅ FIX: Prevent jumping by setting consistent height */
+.hero h2 {
+  font-size: 36px;
+  margin-bottom: 10px;
+  min-height: 48px;
+}
+
+.hero p {
+  font-size: 18px;
+  margin-bottom: 20px;
+  color: #444;
+}
+
+.btn {
+  background-color: #e60050;
+  color: white;
+  padding: 12px 24px;
+  text-decoration: none;
+  font-weight: bold;
+  border-radius: 6px;
+  display: inline-block;
+  transition: background-color 0.2s;
+}
+
+.btn:hover {
+  background-color: #c80045;
+}
+
+.hero img {
+  max-width: 45%;
+  height: auto;
+}
+
+section {
+  padding: 60px 10%;
+  background-color: white;
+}
+
+.section-title {
+  text-align: center;
+  font-size: 32px;
+  margin-bottom: 30px;
+  color: #222;
+}
+
+.section-content {
+  max-width: 900px;
+  margin: 0 auto;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #444;
+}
+
+.services-list, .booking-steps, .faq-list {
+  margin-top: 20px;
+}
+
+li {
+  margin-bottom: 12px;
+}
+
+.why-us {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+}
+
+.testimonial {
+  background-color: #f5f5f5;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 600px;
+  text-align: center;
+  font-style: italic;
+  color: #333;
+}
+
+.who-we-are {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  background-color: #f9f9f9;
+}
+
+.image-box {
+  flex: 1;
+  text-align: center;
+}
+
+.image-box img {
+  max-width: 100%;
+  height: auto;
+}
+
+.content-box {
+  flex: 1;
+  padding: 0 20px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.stat-item {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.stat-item strong {
+  font-size: 20px;
+  display: block;
+  margin-bottom: 5px;
+  color: #e60050;
+}
+
+@media (max-width: 600px) {
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-item {
+    padding: 15px;
+  }
+
+  .stat-item strong {
+    font-size: 18px;
+  }
+}
+
+footer {
+  text-align: center;
+  padding: 40px 10%;
+  background-color: #f4f4f4;
+  color: #555;
+}
+
+@media (max-width: 480px) {
+  footer {
+    padding: 20px 5%;
+    font-size: 14px;
+  }
+
+  .testimonial {
+    padding: 15px;
+  }
+
+  .review-card {
+    padding: 15px;
+  }
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(50px);
+  transition: all 0.6s ease-out;
+}
+
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.review-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  padding-top: 10px;
+}
+
+.review-card {
+  background-color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  padding: 20px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.review-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+}
+
+.review-text {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.review-author {
+  font-weight: bold;
+  color: #e60050;
+  font-size: 14px;
+  text-align: right;
+}
+
+.hamburger {
+  display: none;
+  font-size: 28px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .nav-right {
+    display: none;
+    flex-direction: column;
+    align-items: flex-end;
+    position: absolute;
+    top: 60px;
+    right: 0;
+    left: auto;
+    max-width: 300px;
+    width: auto;
+    background: white;
+    padding: 10px 5%;
+    border-top: 1px solid #eee;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    z-index: 999;
+  }
+
+  .nav-right.show {
+    display: flex;
+  }
+
+  .hamburger {
+    display: block;
+    margin-left: auto;
+  }
+
+  .nav-right a,
+  .nav-right span,
+  .dropdown-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 10px 0;
+  }
+
+  .hero {
+    flex-direction: column;
+    padding: 30px 5%;
+    text-align: center;
+  }
+
+  .hero img {
+    max-width: 90%;
+    margin-top: 20px;
+  }
+
+  .hero h2 {
+    font-size: 24px;
+  }
+
+  .hero p {
+    font-size: 16px;
+  }
+
+  .btn {
+    font-size: 14px;
+    padding: 10px 20px;
+  }
+
+  .content-box {
+    padding: 20px 5%;
+  }
+
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .review-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+.nav-left a {
+  text-decoration: none;
+}
+
+.nav-left h1 {
+  margin: 0;
+  font-size: 20px;
+  color: #e60050;
+  white-space: nowrap;
+  border-bottom: none;
+}
+</style>
+
+</head>
+<body>
+  <header class="reveal">
+    <div class="nav-left">
+        <a href="index.html"><h1> 🚑 ResQNow </h1></a>
+  </div>
+    <button class="hamburger" onclick="toggleMenu()">☰</button>
+
+    <nav class="nav-right" id="mainMenu">
+      <a href="#about">About Us</a>
+      <a href="#services">Services</a>
+      <a href="#why">Why Us?</a>
+      <a href="#faq">FAQs</a>
+      <a href="#contact">Contact</a>
+      <a href="sample.html" id="adminPanelLink" style="display:none;">Admin Panel</a>
+      <span class="phone-number">📞 1800-234-001</span>
+      <span id="auth-links" style="position: relative;"></span>
+    </nav>
+  </header>
+
+  <section class="hero reveal">
+    <div class="content">
+      <h2><span id="typewriter"></span></h2>
+      <p>Book your ambulance in seconds. We're always ready.</p>
+      <button onclick="checkLogin()" class="btn">Book Ambulance Now</button>
+
+    </div>
+    <img src="ambulance.png" alt="Ambulance" />
+  </section>
+
+  <section id="services" class="reveal">
+    <h2 class="section-title">Services Offered</h2>
+    <div class="section-content">
+      <ul class="services-list">
+        <li>🚑 Basic Life Support (BLS) Ambulances</li>
+        <li>🩺 Advanced Life Support (ALS) Ambulances</li>
+        <li>🛫 Air Ambulance Services</li>
+        <li>🚖 Intercity and Emergency Transfers</li>
+        <li>👩‍⚕️ ICU on Wheels for critical care transport</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="who-we-are reveal" id="about">
+    <div class="image-box">
+      <img src="ambulance1.png" alt="Ambulance" />
+    </div>
+    <div class="content-box">
+      <h2>Who We Are</h2>
+      <p>
+        At ResQNow Ambulance, we are a <em>patient-first</em> organization committed to delivering swift,
+        reliable, and advanced medical solutions when every second counts.
+      </p>
+      <p>
+        Backed by a team of medical professionals with over two decades of expertise, we bring unmatched
+        precision and compassion to each mission.
+      </p>
+     <div class="stats">
+      <div class="stat-item">
+        <strong><span class="stat-number" data-target="1500">0</span>+</strong>
+        Patient Transfers since 2016
       </div>
+      <div class="stat-item">
+        <strong><span class="stat-number" data-target="750">0</span>+</strong>
+        Hospital Admissions Secured
+      </div>
+      <div class="stat-item">
+        <strong><span class="stat-number" data-target="250">0</span>+</strong>
+        ECMO Initiation & Transfers
+      </div>
+      <div class="stat-item">
+        <strong>70%</strong>
+        of all organ airlifts in India
+      </div>
+     </div>
+    </div>
+  </section>
+
+  <section class="reveal">
+    <h2 class="section-title">How to Book</h2>
+    <div class="section-content">
+      <ol class="booking-steps">
+        <li>📍 Enter your location and emergency details.</li>
+        <li>📞 Our dispatcher will call to confirm.</li>
+        <li>🚑 Nearest ambulance is dispatched immediately.</li>
+        <li>🏥 Patient is transported to the chosen hospital.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="why" class="reveal">
+    <h2 class="section-title">Why Choose Us?</h2>
+    <div class="why-us">
+      <p>✔️ 24/7 availability with a fleet of modern ambulances.</p>
+      <p>✔️ Trained medical staff on board.</p>
+      <p>✔️ Real-time GPS tracking for transparency.</p>
+      <div class="testimonial">
+        "I was amazed at how quickly the ambulance arrived. The care was top-notch!"<br/>— S. Mehra, Mumbai
+      </div>
+    </div>
+  </section>
+
+  <section id="reviews" class="reveal">
+    <h2 class="section-title">What Our Users Say</h2>
+    <div class="review-container">
+      <div class="review-card">
+        <p class="review-text">"Excellent response time and very professional staff. Truly a lifesaver!"</p>
+        <p class="review-author">— Anjali R., Delhi</p>
+      </div>
+      <div class="review-card">
+        <p class="review-text">"Booking an ambulance was never this easy. Highly recommended."</p>
+        <p class="review-author">— Ramesh K., Pune</p>
+      </div>
+      <div class="review-card">
+        <p class="review-text">"Fast, courteous, and well-equipped service. ResQNow exceeded expectations."</p>
+        <p class="review-author">— Priya S., Bangalore</p>
+      </div>
+      <div class="review-card">
+        <p class="review-text">"Got air ambulance within hours! Exceptional coordination and care."</p>
+        <p class="review-author">— Imran M., Hyderabad</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq" class="reveal">
+    <h2 class="section-title">Frequently Asked Questions</h2>
+    <div class="section-content">
+      <ul class="faq-list">
+        <li><strong>Q:</strong> How fast can I get an ambulance?<br/><strong>A:</strong> Average arrival time is under 15 minutes in metros.</li>
+        <li><strong>Q:</strong> Is the service available 24/7?<br/><strong>A:</strong> Yes, we are operational round-the-clock.</li>
+        <li><strong>Q:</strong> Do you provide air ambulance services?<br/><strong>A:</strong> Yes, across major cities in India.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer class="reveal" id="contact">
+    <p>© 2025 All rights reserved.</p>
+    <p><strong>Phone:</strong> 1800-234-001</p>
+    <p><strong>Email:</strong> <a href="mailto:support@resqnow.com" style="color: #e60050;">support@resqnow.com</a></p>
+  </footer>
+<script>
+// Toggle hamburger menu
+function toggleMenu() {
+  const menu = document.getElementById('mainMenu');
+  menu.classList.toggle('show');
+}
+
+// Prevent hamburger toggle from closing instantly
+document.querySelector('.hamburger').addEventListener('click', function(event) {
+  event.stopPropagation();
+});
+
+// Prevent nav from closing on click inside it
+document.getElementById('mainMenu').addEventListener('click', function(event) {
+  event.stopPropagation();
+});
+
+// Close both menus if clicked outside
+document.addEventListener('click', function(event) {
+  const userMenu = document.getElementById("userDropdownMenu");
+  const dropdownBtn = document.querySelector('.dropdown-btn');
+  const hamburger = document.querySelector('.hamburger');
+  const navMenu = document.getElementById('mainMenu');
+
+  // Dropdown close
+  if (userMenu && dropdownBtn && !userMenu.contains(event.target) && !dropdownBtn.contains(event.target)) {
+    userMenu.style.display = "none";
+  }
+
+  // Hamburger menu close
+  if (navMenu.classList.contains("show") && !navMenu.contains(event.target) && !hamburger.contains(event.target)) {
+    navMenu.classList.remove("show");
+  }
+});
+
+  // Hero typewriter
+  const phrases = ["Fast, Reliable Emergency Help", "Book Ambulance 24/7"];
+  const typewriter = document.getElementById("typewriter");
+  let phraseIndex = 0, charIndex = 0, typing = true;
+
+  function typeLoop() {
+    if (!typewriter) return; // Exit if element not found
+    const current = phrases[phraseIndex];
+    typewriter.textContent = typing ? current.slice(0, ++charIndex) : current.slice(0, --charIndex);
+    if (typing && charIndex === current.length) {
+      typing = false; setTimeout(typeLoop, 2000);
+    } else if (!typing && charIndex === 0) {
+      typing = true; phraseIndex = (phraseIndex + 1) % phrases.length; setTimeout(typeLoop, 500);
+    } else {
+      setTimeout(typeLoop, typing ? 100 : 50);
+    }
+  }
+  typeLoop();
+
+  // Animate stats on scroll
+  function animateStats() {
+    const statNumbers = document.querySelectorAll('.stat-number');
+    statNumbers.forEach(stat => {
+      const target = +stat.getAttribute('data-target');
+      let current = 0;
+      const increment = target / 100; // Animate over ~1.5s
+
+      const updateCount = () => {
+        if (current < target) {
+          current += increment;
+          stat.innerText = Math.ceil(current);
+          requestAnimationFrame(updateCount);
+        } else {
+          stat.innerText = target;
+        }
+      };
+      updateCount();
+    });
+  }
+
+  // Scroll reveal and stats animation trigger
+  let hasCounted = false;
+  const reveals = document.querySelectorAll('.reveal');
+  const revealObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('active');
+        // Check if the stats section is intersecting and hasn't been animated yet
+        if (entry.target.querySelector('.stats') && !hasCounted) {
+          animateStats();
+          hasCounted = true; // Ensure it only runs once
+        }
+        // No need to unobserve, let it stay active
+      }
+    });
+  }, { threshold: 0.15 });
+
+  reveals.forEach(r => revealObserver.observe(r));
+
+  // Login Check
+  function checkLogin() {
+    const isLoggedIn = localStorage.getItem("loggedIn");
+    if (isLoggedIn === "true") {
+      window.location.href = "book.html";
+    } else {
+      alert("Please log in first.");
+      window.location.href = "login.html";
+    }
+  }
+
+  // Update Navbar Auth Links
+  function updateNavbarAuthLinks() {
+    const container = document.getElementById("auth-links");
+    const isLoggedIn = localStorage.getItem("loggedIn") === "true";
+    const name = localStorage.getItem("userName") || "User";
+    const role = localStorage.getItem("userRole");
+
+    const adminLink = document.getElementById('adminPanelLink');
+    if (adminLink) {
+      adminLink.style.display = (isLoggedIn && role === 'admin') ? 'inline-block' : 'none';
+    }
+
+    if (isLoggedIn) {
+      container.innerHTML = `
+        <div class="dropdown">
+          <button class="dropdown-btn" onclick="toggleDropdown(event)">👤 ${name} ▼</button>
+          <div class="dropdown-content" id="userDropdownMenu">
+            <a href="profile.html">Profile</a>
+            <a href="history.html">Booking History</a>
+            <a href="forgot-password.html">Reset Password</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="#" onclick="logout()">Logout</a>
+          </div>
+        </div>
+      `;
+    } else {
+      container.innerHTML = `<a href="login.html">Login/SignUp</a>`;
+    }
+  }
+
+  // Toggle Dropdown on Button Click
+  function toggleDropdown(event) {
+    event.stopPropagation(); // Prevent the document click listener from firing immediately
+    const menu = document.getElementById("userDropdownMenu");
+    if (!menu) return;
+    menu.style.display = menu.style.display === "block" ? "none" : "block";
+  }
+
+
+  // Logout function
+  function logout() {
+    localStorage.clear();
+    window.location.href = "index.html";
+  }
+
+  // Run the function on page load
+  document.addEventListener('DOMContentLoaded', updateNavbarAuthLinks);
+</script>
+
+</body>
+</html>
