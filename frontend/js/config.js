@@ -19,11 +19,19 @@ const API_CONFIG = {
     }
     // Otherwise use production API
     return this.PROD_API;
+  },
+  
+  // Get base URL without /api for health checks
+  getBaseUrl: function() {
+    return this.getCurrentApiUrl().replace('/api', '');
   }
 };
 
 // Export the current API base URL
 const API_BASE_URL = API_CONFIG.getCurrentApiUrl();
 
-// Export the base URL without /api for image paths
-const BASE_URL = API_BASE_URL.replace('/api', '');
+// Export the base URL without /api for image paths and health checks
+const BASE_URL = API_CONFIG.getBaseUrl();
+
+// Export health check endpoint
+const HEALTH_CHECK_URL = `${BASE_URL}/health`;

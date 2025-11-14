@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backend Health Check</title>
+    <script src="js/config.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .status {
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        
+        .status.ok {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+            transition: transform 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .loading {
+            display: none;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid #667eea;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .endpoint-info {
+            background: #fff3cd;
+            color: #856404;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏥 ResQNow Backend Health Check</h1>
+        
+        <div class="info">
+            <p><strong>Current API Endpoint:</strong></p>
+            <div class="endpoint-info" id="apiEndpoint">Loading...</div>
+        </div>
+        
+        <div class="info">
+            <p><strong>Instructions:</strong></p>
+            <p>1. Deploy your backend to Render</p>
+            <p>2. The system automatically detects the correct API endpoint</p>
+            <p>3. Click the "Check Backend Status" button to verify connectivity</p>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Checking backend status...</p>
+        </div>
+        
+        <div class="status" id="status" style="display: none;"></div>
+        
+        <button onclick="checkHealth()">Check Backend Status</button>
+        <button onclick="location.reload()">Refresh</button>
+        
+        <div class="info">
+            <p><strong>Keep Alive Information:</strong></p>
+            <p>The backend now includes a keep-alive mechanism that pings itself every 14 minutes to prevent Render from sleeping.</p>
+            <p>You can also manually ping the <code>/health</code> endpoint to check status.</p>
+        </div>
+    </div>
+
+    <script>
+        // Display the current API endpoint
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('apiEndpoint').textContent = HEALTH_CHECK_URL || 'http://localhost:5000/health';
+        });
+        
+        async function checkHealth() {
+            const loading = document.getElementById('loading');
+            const status = document.getElementById('status');
+            
+            // Show loading indicator
+            loading.style.display = 'block';
+            status.style.display = 'none';
+            
+            try {
+                // Use the health check URL from config
+                const healthUrl = typeof HEALTH_CHECK_URL !== 'undefined' ? HEALTH_CHECK_URL : 'http://localhost:5000/health';
+                const response = await fetch(healthUrl);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    status.innerHTML = `
+                        <h3>✅ Backend is Running</h3>
+                        <p><strong>Status:</strong> ${data.status}</p>
+                        <p><strong>Message:</strong> ${data.message}</p>
+                        <p><strong>Timestamp:</strong> ${new Date(data.timestamp).toLocaleString()}</p>
+                        <p><strong>Uptime:</strong> ${Math.floor(data.uptime)} seconds</p>
+                    `;
+                    status.className = 'status ok';
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                status.innerHTML = `
+                    <h3>❌ Backend Connection Failed</h3>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                    <p>Please ensure your backend is deployed and accessible.</p>
+                `;
+                status.className = 'status error';
+            } finally {
+                // Hide loading indicator and show status
+                loading.style.display = 'none';
+                status.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
