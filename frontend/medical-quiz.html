@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Medical Quiz | ResQNow</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+      color: #222;
+      animation: gradientBG 15s ease infinite;
+      background-size: 400% 400%;
+      min-height: 100vh;
+      position: relative;
+      overflow-y: auto;
+      font-size: 18px;
+    }
+    
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    /* Bubbles animation */
+    .bubbles {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+      top: 0;
+      left: 0;
+    }
+    
+    .bubble {
+      position: absolute;
+      bottom: -100px;
+      width: 80px;
+      height: 80px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      opacity: 0.5;
+      animation: rise 10s infinite ease-in;
+    }
+    
+    .bubble:nth-child(1) {
+      width: 80px;
+      height: 80px;
+      left: 10%;
+      animation-duration: 8s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(2) {
+      width: 60px;
+      height: 60px;
+      left: 20%;
+      animation-duration: 5s;
+      animation-delay: 1s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(3) {
+      width: 100px;
+      height: 100px;
+      left: 35%;
+      animation-duration: 7s;
+      animation-delay: 2s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(4) {
+      width: 150px;
+      height: 150px;
+      left: 50%;
+      animation-duration: 11s;
+      animation-delay: 0s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(5) {
+      width: 70px;
+      height: 70px;
+      left: 55%;
+      animation-duration: 6s;
+      animation-delay: 1s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(6) {
+      width: 90px;
+      height: 90px;
+      left: 65%;
+      animation-duration: 8s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(7) {
+      width: 70px;
+      height: 70px;
+      left: 75%;
+      animation-duration: 7s;
+      animation-delay: 3s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(8) {
+      width: 130px;
+      height: 130px;
+      left: 80%;
+      animation-duration: 12s;
+      animation-delay: 2s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(9) {
+      width: 50px;
+      height: 50px;
+      left: 70%;
+      animation-duration: 5s;
+      animation-delay: 1s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(10) {
+      width: 100px;
+      height: 100px;
+      left: 85%;
+      animation-duration: 9s;
+      animation-delay: 4s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    @keyframes rise {
+      0% {
+        bottom: -100px;
+        transform: translateX(0);
+      }
+      50% {
+        transform: translateX(100px);
+      }
+      100% {
+        bottom: 1080px;
+        transform: translateX(-200px);
+      }
+    }
+
+    .navbar {
+      background: rgba(0, 0, 0, 0.2);
+      padding: 25px 12%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      position: relative;
+      z-index: 100;
+    }
+
+    .navbar h1 {
+      color: #fff;
+      font-size: 36px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .navbar a {
+      text-decoration: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      padding: 15px 24px;
+      border-radius: 10px;
+      margin-left: 20px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(5px);
+      font-size: 20px;
+    }
+
+    .navbar a:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.05);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    .quiz-header {
+      text-align: center;
+      color: white;
+      margin-bottom: 30px;
+    }
+
+    .quiz-header h2 {
+      font-size: 48px;
+      margin-bottom: 10px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .quiz-header p {
+      font-size: 22px;
+      max-width: 800px;
+      margin: 0 auto 15px;
+    }
+    
+    .quiz-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #d4fc79, #96e6a1);
+      color: #333;
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-weight: bold;
+      font-size: 16px;
+      box-shadow: 0 4px 15px rgba(212, 252, 121, 0.4);
+      animation: badgePulse 2s infinite;
+      margin-top: 15px;
+    }
+    
+    @keyframes badgePulse {
+      0% { transform: scale(1); box-shadow: 0 4px 15px rgba(212, 252, 121, 0.4); }
+      50% { transform: scale(1.05); box-shadow: 0 6px 20px rgba(212, 252, 121, 0.6); }
+      100% { transform: scale(1); box-shadow: 0 4px 15px rgba(212, 252, 121, 0.4); }
+    }
+
+    .quiz-container {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      margin: 40px 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .quiz-info {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+      text-align: center;
+    }
+
+    .info-box {
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 15px;
+      min-width: 150px;
+      margin: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .info-value {
+      font-size: 32px;
+      font-weight: bold;
+      color: #667eea;
+      margin: 10px 0;
+    }
+
+    .info-label {
+      font-size: 16px;
+      color: #666;
+    }
+
+    .question-container {
+      margin: 30px 0;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .question-number {
+      font-size: 18px;
+      color: #667eea;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    .question-text {
+      font-size: 24px;
+      margin-bottom: 25px;
+      line-height: 1.4;
+    }
+
+    .options-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+
+    .option {
+      background: rgba(102, 126, 234, 0.1);
+      border: 2px solid rgba(102, 126, 234, 0.3);
+      border-radius: 10px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 18px;
+      line-height: 1.4;
+    }
+
+    .option:hover {
+      background: rgba(102, 126, 234, 0.2);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .option.selected {
+      background: rgba(102, 126, 234, 0.3);
+      border-color: #667eea;
+      box-shadow: 0 0 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .option.correct {
+      background: rgba(40, 167, 69, 0.3);
+      border-color: #28a745;
+      box-shadow: 0 0 15px rgba(40, 167, 69, 0.4);
+    }
+
+    .option.incorrect {
+      background: rgba(220, 53, 69, 0.3);
+      border-color: #dc3545;
+      box-shadow: 0 0 15px rgba(220, 53, 69, 0.4);
+    }
+
+    .explanation {
+      background: rgba(255, 193, 7, 0.2);
+      border-left: 4px solid #ffc107;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 0 10px 10px 0;
+      display: none;
+    }
+
+    .explanation.show {
+      display: block;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin: 30px 0;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 50px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+      min-width: 150px;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .quiz-results {
+      text-align: center;
+      padding: 30px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 20px;
+      margin: 30px 0;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      display: none;
+    }
+
+    .quiz-results.show {
+      display: block;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .results-title {
+      font-size: 36px;
+      margin-bottom: 20px;
+    }
+
+    .results-score {
+      font-size: 48px;
+      font-weight: bold;
+      margin: 20px 0;
+      color: #d4fc79;
+    }
+
+    .results-message {
+      font-size: 24px;
+      margin: 20px 0;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.6;
+    }
+
+    .progress-container {
+      height: 10px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 5px;
+      margin: 20px 0;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #d4fc79, #96e6a1);
+      border-radius: 5px;
+      transition: width 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 15px 5%;
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .navbar a {
+        margin: 10px 5px;
+        padding: 10px 15px;
+        font-size: 16px;
+      }
+      
+      .options-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .controls {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .btn {
+        width: 100%;
+        max-width: 300px;
+        margin: 10px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Bubbles Container -->
+  <div class="bubbles">
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+  </div>
+  
+  <div class="navbar">
+    <h1> 🧠 ResQNow Medical Quiz </h1>
+    <div>
+      <a href="index.html">Home</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="quiz-header">
+      <h2>🧠 Medical Knowledge Challenge</h2>
+      <p>Test your medical knowledge with our comprehensive quiz covering emergency response, first aid, and healthcare topics.</p>
+      <div class="quiz-badge">MEDICAL EXPERTISE ASSESSMENT</div>
+    </div>
+    
+    <div class="quiz-container">
+      <div class="quiz-info">
+        <div class="info-box">
+          <div class="info-label">Questions</div>
+          <div class="info-value" id="totalQuestions">10</div>
+        </div>
+        <div class="info-box">
+          <div class="info-label">Answered</div>
+          <div class="info-value" id="answered">0</div>
+        </div>
+        <div class="info-box">
+          <div class="info-label">Correct</div>
+          <div class="info-value" id="correct">0</div>
+        </div>
+        <div class="info-box">
+          <div class="info-label">Score</div>
+          <div class="info-value" id="score">0%</div>
+        </div>
+      </div>
+      
+      <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      
+      <div class="question-container">
+        <div class="question-number" id="questionNumber">Question 1 of 10</div>
+        <div class="question-text" id="questionText">Loading question...</div>
+        
+        <div class="options-container" id="optionsContainer">
+          <!-- Options will be populated by JavaScript -->
+        </div>
+        
+        <div class="explanation" id="explanation">
+          <!-- Explanation will be shown after answering -->
+        </div>
+      </div>
+      
+      <div class="controls">
+        <button class="btn" id="prevBtn" onclick="previousQuestion()" disabled>Previous</button>
+        <button class="btn" id="nextBtn" onclick="nextQuestion()">Next Question</button>
+        <button class="btn" id="submitBtn" onclick="submitQuiz()" style="display: none;">Submit Quiz</button>
+      </div>
+      
+      <div class="quiz-results" id="quizResults">
+        <h2 class="results-title">🏆 Quiz Completed!</h2>
+        <div class="results-score" id="finalScore">0%</div>
+        <div class="results-message" id="resultsMessage">Great job! You've completed the medical knowledge quiz.</div>
+        <button class="btn" onclick="restartQuiz()">Retake Quiz</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Quiz questions data
+    const quizQuestions = [
+      {
+        question: "What is the first step in the Adult Cardiac Chain of Survival?",
+        options: [
+          "Early CPR with emphasis on chest compressions",
+          "Rapid defibrillation",
+          "Recognition of cardiac arrest and activation of emergency response",
+          "Effective advanced life support"
+        ],
+        correct: 2,
+        explanation: "The first step is recognizing cardiac arrest and activating the emergency response system (calling 911). This ensures professional help is on the way before any other interventions."
+      },
+      {
+        question: "What is the recommended rate for chest compressions during CPR?",
+        options: [
+          "80-100 compressions per minute",
+          "100-120 compressions per minute",
+          "120-140 compressions per minute",
+          "60-80 compressions per minute"
+        ],
+        correct: 1,
+        explanation: "The American Heart Association recommends 100-120 compressions per minute for adult CPR. A helpful way to maintain this rate is to compress to the beat of the song 'Stayin' Alive' by the Bee Gees."
+      },
+      {
+        question: "How should you position an unconscious patient who is breathing normally?",
+        options: [
+          "On their back with head tilted back",
+          "On their side (recovery position)",
+          "Sitting upright",
+          "On their stomach"
+        ],
+        correct: 1,
+        explanation: "The recovery position (on their side) is the safest position for an unconscious but breathing patient. It keeps the airway open and allows fluids to drain from the mouth, preventing choking."
+      },
+      {
+        question: "What is the proper technique for treating a severe bleed?",
+        options: [
+          "Apply a tourniquet immediately",
+          "Apply direct pressure to the wound",
+          "Clean the wound with water first",
+          "Apply ice directly to the wound"
+        ],
+        correct: 1,
+        explanation: "Direct pressure is the first and most important step in controlling bleeding. Apply firm pressure directly to the wound with a clean cloth or your hand until bleeding stops or help arrives."
+      },
+      {
+        question: "What does the acronym FAST stand for in recognizing stroke symptoms?",
+        options: [
+          "Fast, Accurate, Simple, Timely",
+          "Face, Arms, Speech, Time",
+          "Feet, Arms, Speech, Tongue",
+          "Face, Arms, Spine, Time"
+        ],
+        correct: 1,
+        explanation: "FAST stands for Face drooping, Arm weakness, Speech difficulty, and Time to call 911. These are key signs to recognize a stroke and act quickly, as prompt treatment can minimize brain damage."
+      },
+      {
+        question: "What is the recommended depth for chest compressions in adults?",
+        options: [
+          "At least 2 inches (5 cm)",
+          "At least 1 inch (2.5 cm)",
+          "At least 3 inches (7.5 cm)",
+          "At least 1.5 inches (4 cm)"
+        ],
+        correct: 0,
+        explanation: "For adult CPR, compressions should be at least 2 inches (5 cm) deep. This depth is necessary to effectively pump blood through the heart and to the brain and other vital organs."
+      },
+      {
+        question: "What should you do if a person is choking and cannot speak, cough, or breathe?",
+        options: [
+          "Give them water to drink",
+          "Encourage them to cough harder",
+          "Perform the Heimlich maneuver",
+          "Slap them on the back"
+        ],
+        correct: 2,
+        explanation: "When a person cannot speak, cough, or breathe, they are experiencing a complete airway obstruction. The Heimlich maneuver (abdominal thrusts) is the appropriate response to dislodge the object."
+      },
+      {
+        question: "What is the normal resting heart rate for adults?",
+        options: [
+          "40-60 beats per minute",
+          "60-100 beats per minute",
+          "100-120 beats per minute",
+          "120-140 beats per minute"
+        ],
+        correct: 1,
+        explanation: "A normal resting heart rate for adults ranges from 60 to 100 beats per minute. Well-trained athletes may have lower resting heart rates, but for most people, 60-100 bpm is considered normal."
+      },
+      {
+        question: "What is the primary purpose of wearing gloves during first aid?",
+        options: [
+          "To keep hands warm",
+          "To protect yourself and the patient from disease transmission",
+          "To improve grip on medical instruments",
+          "To make you look professional"
+        ],
+        correct: 1,
+        explanation: "Gloves are worn to create a barrier between you and potentially infectious materials, protecting both you and the patient from disease transmission. This is a fundamental principle of universal precautions."
+      },
+      {
+        question: "What is the first action you should take when approaching an emergency scene?",
+        options: [
+          "Immediately help the victim",
+          "Call 911",
+          "Check for dangers to yourself and others",
+          "Start CPR"
+        ],
+        correct: 2,
+        explanation: "Your safety is the top priority. Always check for dangers at the scene before approaching. An unsafe scene can turn you into another victim, which helps no one. Once the scene is safe, then you can assist the victim."
+      }
+    ];
+
+    // Quiz state variables
+    let currentQuestion = 0;
+    let score = 0;
+    let answeredQuestions = 0;
+    let userAnswers = new Array(quizQuestions.length).fill(null);
+    let selectedOption = null;
+
+    // DOM elements
+    const questionNumberElement = document.getElementById('questionNumber');
+    const questionTextElement = document.getElementById('questionText');
+    const optionsContainer = document.getElementById('optionsContainer');
+    const explanationElement = document.getElementById('explanation');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const totalQuestionsElement = document.getElementById('totalQuestions');
+    const answeredElement = document.getElementById('answered');
+    const correctElement = document.getElementById('correct');
+    const scoreElement = document.getElementById('score');
+    const progressBar = document.getElementById('progressBar');
+    const quizResults = document.getElementById('quizResults');
+    const finalScoreElement = document.getElementById('finalScore');
+    const resultsMessage = document.getElementById('resultsMessage');
+
+    // Initialize quiz
+    document.addEventListener('DOMContentLoaded', function() {
+      totalQuestionsElement.textContent = quizQuestions.length;
+      loadQuestion();
+    });
+
+    // Load current question
+    function loadQuestion() {
+      const question = quizQuestions[currentQuestion];
+      
+      // Update question number and text
+      questionNumberElement.textContent = `Question ${currentQuestion + 1} of ${quizQuestions.length}`;
+      questionTextElement.textContent = question.question;
+      
+      // Clear previous options
+      optionsContainer.innerHTML = '';
+      
+      // Create option elements
+      question.options.forEach((option, index) => {
+        const optionElement = document.createElement('div');
+        optionElement.className = 'option';
+        optionElement.innerHTML = `
+          <strong>${String.fromCharCode(65 + index)}.</strong> ${option}
+        `;
+        
+        // Add click event
+        optionElement.addEventListener('click', () => selectOption(index, optionElement));
+        
+        // Restore previous selection if exists
+        if (userAnswers[currentQuestion] === index) {
+          optionElement.classList.add('selected');
+          selectedOption = optionElement;
+        }
+        
+        optionsContainer.appendChild(optionElement);
+      });
+      
+      // Show/hide explanation
+      if (userAnswers[currentQuestion] !== null) {
+        showExplanation();
+        nextBtn.disabled = false;
+      } else {
+        explanationElement.classList.remove('show');
+        nextBtn.disabled = true;
+      }
+      
+      // Update button states
+      prevBtn.disabled = currentQuestion === 0;
+      
+      // Show submit button on last question
+      if (currentQuestion === quizQuestions.length - 1) {
+        nextBtn.style.display = 'none';
+        submitBtn.style.display = 'block';
+      } else {
+        nextBtn.style.display = 'block';
+        submitBtn.style.display = 'none';
+      }
+      
+      // Update progress
+      updateProgress();
+    }
+
+    // Select an option
+    function selectOption(index, element) {
+      // If already answered, don't allow changes
+      if (userAnswers[currentQuestion] !== null) return;
+      
+      // Deselect previous selection
+      if (selectedOption) {
+        selectedOption.classList.remove('selected');
+      }
+      
+      // Select new option
+      element.classList.add('selected');
+      selectedOption = element;
+      userAnswers[currentQuestion] = index;
+      
+      // Enable next button
+      nextBtn.disabled = false;
+      
+      // Show explanation immediately
+      showExplanation();
+      
+      // Update stats
+      answeredQuestions = userAnswers.filter(answer => answer !== null).length;
+      answeredElement.textContent = answeredQuestions;
+      
+      // Update progress
+      updateProgress();
+    }
+
+    // Show explanation for current question
+    function showExplanation() {
+      const question = quizQuestions[currentQuestion];
+      const userAnswer = userAnswers[currentQuestion];
+      
+      // Show explanation
+      explanationElement.innerHTML = `
+        <strong>Explanation:</strong> ${question.explanation}
+      `;
+      explanationElement.classList.add('show');
+      
+      // Highlight correct/incorrect answers
+      const options = optionsContainer.querySelectorAll('.option');
+      options.forEach((option, index) => {
+        if (index === question.correct) {
+          option.classList.add('correct');
+        } else if (index === userAnswer && userAnswer !== question.correct) {
+          option.classList.add('incorrect');
+        }
+      });
+      
+      // Update score if this is the first time answering
+      if (userAnswer !== null && userAnswers.indexOf(userAnswer) === currentQuestion) {
+        if (userAnswer === question.correct) {
+          score++;
+          correctElement.textContent = score;
+        }
+        
+        // Update score percentage
+        const percentage = Math.round((score / answeredQuestions) * 100) || 0;
+        scoreElement.textContent = `${percentage}%`;
+      }
+    }
+
+    // Move to next question
+    function nextQuestion() {
+      if (currentQuestion < quizQuestions.length - 1) {
+        currentQuestion++;
+        selectedOption = null;
+        loadQuestion();
+      }
+    }
+
+    // Move to previous question
+    function previousQuestion() {
+      if (currentQuestion > 0) {
+        currentQuestion--;
+        loadQuestion();
+      }
+    }
+
+    // Update progress bar and stats
+    function updateProgress() {
+      const progress = ((currentQuestion + 1) / quizQuestions.length) * 100;
+      progressBar.style.width = `${progress}%`;
+    }
+
+    // Submit quiz
+    function submitQuiz() {
+      // Calculate final score
+      const finalScore = Math.round((score / quizQuestions.length) * 100);
+      
+      // Update final score display
+      finalScoreElement.textContent = `${finalScore}%`;
+      
+      // Set results message based on score
+      if (finalScore >= 90) {
+        resultsMessage.textContent = "Outstanding! You have exceptional medical knowledge. Your expertise could save lives!";
+      } else if (finalScore >= 70) {
+        resultsMessage.textContent = "Great job! You have solid medical knowledge. Keep learning to further improve your skills!";
+      } else if (finalScore >= 50) {
+        resultsMessage.textContent = "Good effort! You have basic medical knowledge. Review the explanations to strengthen your understanding!";
+      } else {
+        resultsMessage.textContent = "Keep studying! Review the explanations and consider taking additional medical training courses.";
+      }
+      
+      // Show results
+      quizResults.classList.add('show');
+    }
+
+    // Restart quiz
+    function restartQuiz() {
+      currentQuestion = 0;
+      score = 0;
+      answeredQuestions = 0;
+      userAnswers = new Array(quizQuestions.length).fill(null);
+      selectedOption = null;
+      
+      // Reset UI
+      answeredElement.textContent = '0';
+      correctElement.textContent = '0';
+      scoreElement.textContent = '0%';
+      quizResults.classList.remove('show');
+      
+      // Reset buttons
+      nextBtn.style.display = 'block';
+      submitBtn.style.display = 'none';
+      nextBtn.disabled = true;
+      
+      // Load first question
+      loadQuestion();
+    }
+
+    // Logout function
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('userName');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('loggedIn');
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>

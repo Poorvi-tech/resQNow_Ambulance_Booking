@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Health Tips | ResQNow</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      color: #222;
+      animation: gradientBG 15s ease infinite;
+      background-size: 400% 400%;
+      min-height: 100vh;
+      position: relative;
+      overflow-y: auto;
+      font-size: 18px;
+    }
+    
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    /* Bubbles animation */
+    .bubbles {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+      top: 0;
+      left: 0;
+    }
+    
+    .bubble {
+      position: absolute;
+      bottom: -100px;
+      width: 80px;
+      height: 80px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      opacity: 0.5;
+      animation: rise 10s infinite ease-in;
+    }
+    
+    .bubble:nth-child(1) {
+      width: 80px;
+      height: 80px;
+      left: 10%;
+      animation-duration: 8s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(2) {
+      width: 60px;
+      height: 60px;
+      left: 20%;
+      animation-duration: 5s;
+      animation-delay: 1s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(3) {
+      width: 100px;
+      height: 100px;
+      left: 35%;
+      animation-duration: 7s;
+      animation-delay: 2s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(4) {
+      width: 150px;
+      height: 150px;
+      left: 50%;
+      animation-duration: 11s;
+      animation-delay: 0s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(5) {
+      width: 70px;
+      height: 70px;
+      left: 55%;
+      animation-duration: 6s;
+      animation-delay: 1s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(6) {
+      width: 90px;
+      height: 90px;
+      left: 65%;
+      animation-duration: 8s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(7) {
+      width: 70px;
+      height: 70px;
+      left: 75%;
+      animation-duration: 7s;
+      animation-delay: 3s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(8) {
+      width: 130px;
+      height: 130px;
+      left: 80%;
+      animation-duration: 12s;
+      animation-delay: 2s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(9) {
+      width: 50px;
+      height: 50px;
+      left: 70%;
+      animation-duration: 5s;
+      animation-delay: 1s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(10) {
+      width: 100px;
+      height: 100px;
+      left: 85%;
+      animation-duration: 9s;
+      animation-delay: 4s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    @keyframes rise {
+      0% {
+        bottom: -100px;
+        transform: translateX(0);
+      }
+      50% {
+        transform: translateX(100px);
+      }
+      100% {
+        bottom: 1080px;
+        transform: translateX(-200px);
+      }
+    }
+
+    .navbar {
+      background: rgba(0, 0, 0, 0.2);
+      padding: 25px 12%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      position: relative;
+      z-index: 100;
+    }
+
+    .navbar h1 {
+      color: #fff;
+      font-size: 36px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .navbar a {
+      text-decoration: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      padding: 15px 24px;
+      border-radius: 10px;
+      margin-left: 20px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(5px);
+      font-size: 20px;
+    }
+
+    .navbar a:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.05);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    .tips-header {
+      text-align: center;
+      color: white;
+      margin-bottom: 30px;
+    }
+
+    .tips-header h2 {
+      font-size: 48px;
+      margin-bottom: 10px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .tips-header p {
+      font-size: 22px;
+      max-width: 800px;
+      margin: 0 auto 15px;
+    }
+    
+    .wellness-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #00c9ff, #92fe9d);
+      color: #333;
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-weight: bold;
+      font-size: 16px;
+      box-shadow: 0 4px 15px rgba(0, 201, 255, 0.4);
+      animation: badgePulse 2s infinite;
+      margin-top: 15px;
+    }
+    
+    @keyframes badgePulse {
+      0% { transform: scale(1); box-shadow: 0 4px 15px rgba(0, 201, 255, 0.4); }
+      50% { transform: scale(1.05); box-shadow: 0 6px 20px rgba(0, 201, 255, 0.6); }
+      100% { transform: scale(1); box-shadow: 0 4px 15px rgba(0, 201, 255, 0.4); }
+    }
+
+    .tips-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin: 40px 0;
+    }
+
+    .tip-card {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: transform 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tip-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .tip-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: linear-gradient(90deg, #00c9ff, #92fe9d);
+    }
+
+    .tip-card h3 {
+      color: #333;
+      margin-bottom: 20px;
+      font-size: 28px;
+      display: flex;
+      align-items: center;
+    }
+
+    .tip-card h3 i {
+      margin-right: 15px;
+      font-size: 32px;
+    }
+
+    .tip-card ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    .tip-card li {
+      margin-bottom: 15px;
+      padding-left: 30px;
+      position: relative;
+      line-height: 1.6;
+    }
+
+    .tip-card li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #00c9ff;
+      font-weight: bold;
+      font-size: 20px;
+    }
+
+    .tip-category {
+      display: inline-block;
+      background: rgba(0, 201, 255, 0.1);
+      color: #00c9ff;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    .daily-tip {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 20px;
+      margin: 40px 0;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .daily-tip::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      transform: rotate(30deg);
+    }
+
+    .daily-tip h3 {
+      font-size: 32px;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .daily-tip p {
+      font-size: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+      position: relative;
+      line-height: 1.6;
+    }
+
+    .tip-icon {
+      font-size: 48px;
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 15px 5%;
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .navbar a {
+        margin: 10px 5px;
+        padding: 10px 15px;
+        font-size: 16px;
+      }
+      
+      .tips-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Bubbles Container -->
+  <div class="bubbles">
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+  </div>
+  
+  <div class="navbar">
+    <h1> 💡 ResQNow Health Tips </h1>
+    <div>
+      <a href="index.html">Home</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="tips-header">
+      <h2>💡 Daily Health & Wellness Tips</h2>
+      <p>Discover expert advice to improve your health, boost your energy, and enhance your quality of life.</p>
+      <div class="wellness-badge">WELLNESS EXPERT APPROVED</div>
+    </div>
+    
+    <div class="daily-tip">
+      <span class="tip-icon">🌟</span>
+      <h3>Today's Wellness Tip</h3>
+      <p>Start your day with a glass of warm water with lemon to boost metabolism and hydrate your body after sleep. This simple habit can improve digestion and provide a natural energy boost!</p>
+    </div>
+    
+    <div class="tips-grid">
+      <div class="tip-card">
+        <span class="tip-category">Physical Health</span>
+        <h3>🏃‍♂️ Exercise</h3>
+        <ul>
+          <li>Aim for at least 150 minutes of moderate aerobic activity per week</li>
+          <li>Incorporate strength training exercises twice a week</li>
+          <li>Take short walks after meals to aid digestion</li>
+          <li>Stretch daily to maintain flexibility and prevent injury</li>
+          <li>Find activities you enjoy to make exercise sustainable</li>
+        </ul>
+      </div>
+      
+      <div class="tip-card">
+        <span class="tip-category">Nutrition</span>
+        <h3>🥗 Balanced Diet</h3>
+        <ul>
+          <li>Fill half your plate with colorful fruits and vegetables</li>
+          <li>Choose whole grains over refined grains</li>
+          <li>Include lean proteins in every meal</li>
+          <li>Stay hydrated with 8-10 glasses of water daily</li>
+          <li>Limit processed foods and added sugars</li>
+        </ul>
+      </div>
+      
+      <div class="tip-card">
+        <span class="tip-category">Mental Health</span>
+        <h3>🧘‍♀️ Mental Wellness</h3>
+        <ul>
+          <li>Practice mindfulness or meditation for 10 minutes daily</li>
+          <li>Maintain strong social connections with friends and family</li>
+          <li>Get 7-9 hours of quality sleep each night</li>
+          <li>Take breaks from screens to reduce digital fatigue</li>
+          <li>Engage in hobbies that bring you joy</li>
+        </ul>
+      </div>
+      
+      <div class="tip-card">
+        <span class="tip-category">Prevention</span>
+        <h3>🛡️ Health Screening</h3>
+        <ul>
+          <li>Schedule annual physical exams with your healthcare provider</li>
+          <li>Monitor your blood pressure and cholesterol regularly</li>
+          <li>Stay up-to-date with vaccinations and immunizations</li>
+          <li>Perform regular self-examinations for skin changes</li>
+          <li>Know your family health history and share with your doctor</li>
+        </ul>
+      </div>
+      
+      <div class="tip-card">
+        <span class="tip-category">Lifestyle</span>
+        <h3>🚭 Healthy Habits</h3>
+        <ul>
+          <li>Avoid smoking and limit alcohol consumption</li>
+          <li>Maintain good hygiene to prevent infections</li>
+          <li>Protect your skin from excessive sun exposure</li>
+          <li>Practice safe sex and use protection when necessary</li>
+          <li>Create a safe and healthy living environment</li>
+        </ul>
+      </div>
+      
+      <div class="tip-card">
+        <span class="tip-category">Emergency Prep</span>
+        <h3>🚑 Emergency Readiness</h3>
+        <ul>
+          <li>Keep a well-stocked first aid kit at home</li>
+          <li>Learn CPR and basic first aid techniques</li>
+          <li>Know the location of the nearest hospital</li>
+          <li>Keep emergency contact numbers easily accessible</li>
+          <li>Have a plan for natural disasters or emergencies</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Add floating animation to tip cards
+    document.addEventListener('DOMContentLoaded', function() {
+      const tipCards = document.querySelectorAll('.tip-card');
+      
+      tipCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+          this.style.animation = 'float 3s ease-in-out infinite';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+          this.style.animation = '';
+        });
+      });
+      
+      // Add CSS for floating animation
+      const style = document.createElement('style');
+      style.innerHTML = `
+        @keyframes float {
+          0% { transform: translateY(0px); }
+          50% { transform: translateY(-10px); }
+          100% { transform: translateY(0px); }
+        }
+      `;
+      document.head.appendChild(style);
+    });
+    
+    // Logout function
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('userName');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('loggedIn');
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>

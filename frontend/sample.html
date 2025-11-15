@@ -9,12 +9,13 @@
         font-family: "Segoe UI", sans-serif;
         margin: 0;
         padding: 0;
-        background-color: #f9f9f9;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: #333;
+        min-height: 100vh;
       }
 
       header {
-        background-color: #fff;
+        background: rgba(255, 255, 255, 0.9);
         padding: 20px 10%;
         display: flex;
         justify-content: space-between;
@@ -22,6 +23,8 @@
         border-bottom: 1px solid #ddd;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         flex-wrap: wrap;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
       }
 
       header h1 {
@@ -40,51 +43,110 @@
 
       nav a {
         text-decoration: none;
-        color: #555;
+        color: #fff;
         font-weight: bold;
         font-size: 20px;
         padding: 14px 20px;
-        background-color: #f0f0f0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         border-radius: 8px;
         transition: all 0.3s ease;
         margin-right: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        position: relative;
+        overflow: hidden;
+      }
+
+      nav a::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateX(-100%);
+        transition: transform 0.6s ease;
+      }
+
+      nav a:hover::before {
+        transform: translateX(100%);
       }
 
       nav a:hover {
-        background-color: #e0e0e0;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
       }
 
       .container {
         padding: 40px 10%;
+        max-width: 1200px;
+        margin: 0 auto;
       }
 
       h2 {
         color: #e60050;
         margin-bottom: 25px;
         font-size: 30px;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(230, 0, 80, 0.2);
       }
 
       .booking-entry {
-        background: #fff;
-        border: 1px solid #ccc;
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(230, 0, 80, 0.2);
         padding: 20px;
         border-radius: 12px;
         margin-bottom: 20px;
         box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
         font-size: 18px;
         line-height: 1.6;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(5px);
+      }
+      
+      .booking-entry:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        border-color: rgba(230, 0, 80, 0.4);
+      }
+      
+      .booking-entry strong {
+        color: #e60050;
+      }
+      
+      .action-button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        margin-top: 15px;
+      }
+      
+      .action-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
       }
 
       footer {
         text-align: center;
         padding: 25px 10%;
-        background-color: #f4f4f4;
+        background: rgba(0, 0, 0, 0.2);
         border-top: 1px solid #ddd;
         margin-top: 50px;
-        color: #777;
+        color: #fff;
         font-size: 16px;
+        backdrop-filter: blur(5px);
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
       }
 
       /* Responsive Styles */
@@ -180,9 +242,9 @@
           }
 
           let html = "";
-          bookings.forEach((b) => {
+          bookings.forEach((b, index) => {
             html += `
-            <div class="booking-entry">
+            <div class="booking-entry" data-booking-id="${b._id}">
               <p><strong>Patient Name:</strong> ${b.patientName}</p>
               <p><strong>Pickup Location:</strong> ${b.pickupLocation}</p>
               <p><strong>Hospital Destination:</strong> ${b.dropLocation}</p>
@@ -192,15 +254,43 @@
                 b.bookingDate
               ).toLocaleString()}</p>
               <p><strong>Booked By (User ID):</strong> ${b.userId}</p>
+              <button class="action-button" onclick="viewBookingDetails('${b._id}')">View Details</button>
             </div>
           `;
           });
 
           bookingContainer.innerHTML = html;
+          
+          // Add animation to booking entries
+          animateBookingEntries();
         } catch (error) {
           console.error(error);
           bookingContainer.innerHTML = "<p>Error loading bookings.</p>";
         }
+      }
+      
+      // Animate booking entries when they appear
+      function animateBookingEntries() {
+        const entries = document.querySelectorAll('.booking-entry');
+        entries.forEach((entry, index) => {
+          // Add a delay for each entry to create a cascading effect
+          setTimeout(() => {
+            entry.style.opacity = '0';
+            entry.style.transform = 'translateY(20px)';
+            entry.style.transition = 'all 0.5s ease';
+            
+            // Trigger the animation
+            setTimeout(() => {
+              entry.style.opacity = '1';
+              entry.style.transform = 'translateY(0)';
+            }, 50);
+          }, index * 100);
+        });
+      }
+      
+      // View booking details (placeholder function)
+      function viewBookingDetails(bookingId) {
+        alert(`Viewing details for booking ID: ${bookingId}\nIn a real application, this would show detailed booking information.`);
       }
 
       function logout() {

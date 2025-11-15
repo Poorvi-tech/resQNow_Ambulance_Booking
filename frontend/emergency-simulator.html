@@ -1,0 +1,1663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Emergency Simulator | ResQNow</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script src="js/config.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #ff416c, #ff4b2b);
+      color: #222;
+      animation: gradientBG 15s ease infinite;
+      background-size: 400% 400%;
+      min-height: 100vh;
+      position: relative;
+      overflow-y: auto;
+      font-size: 18px;
+    }
+    
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    /* Bubbles animation */
+    .bubbles {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+      top: 0;
+      left: 0;
+    }
+    
+    .bubble {
+      position: absolute;
+      bottom: -100px;
+      width: 80px;
+      height: 80px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      opacity: 0.5;
+      animation: rise 10s infinite ease-in;
+    }
+    
+    .bubble:nth-child(1) {
+      width: 80px;
+      height: 80px;
+      left: 10%;
+      animation-duration: 8s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(2) {
+      width: 60px;
+      height: 60px;
+      left: 20%;
+      animation-duration: 5s;
+      animation-delay: 1s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(3) {
+      width: 100px;
+      height: 100px;
+      left: 35%;
+      animation-duration: 7s;
+      animation-delay: 2s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(4) {
+      width: 150px;
+      height: 150px;
+      left: 50%;
+      animation-duration: 11s;
+      animation-delay: 0s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(5) {
+      width: 70px;
+      height: 70px;
+      left: 55%;
+      animation-duration: 6s;
+      animation-delay: 1s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(6) {
+      width: 90px;
+      height: 90px;
+      left: 65%;
+      animation-duration: 8s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(7) {
+      width: 70px;
+      height: 70px;
+      left: 75%;
+      animation-duration: 7s;
+      animation-delay: 3s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(8) {
+      width: 130px;
+      height: 130px;
+      left: 80%;
+      animation-duration: 12s;
+      animation-delay: 2s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(9) {
+      width: 50px;
+      height: 50px;
+      left: 70%;
+      animation-duration: 5s;
+      animation-delay: 1s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(10) {
+      width: 100px;
+      height: 100px;
+      left: 85%;
+      animation-duration: 9s;
+      animation-delay: 4s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    @keyframes rise {
+      0% {
+        bottom: -100px;
+        transform: translateX(0);
+      }
+      50% {
+        transform: translateX(100px);
+      }
+      100% {
+        bottom: 1080px;
+        transform: translateX(-200px);
+      }
+    }
+
+    .navbar {
+      background: rgba(0, 0, 0, 0.2);
+      padding: 25px 12%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      position: relative;
+      z-index: 100;
+    }
+
+    .navbar h1 {
+      color: #fff;
+      font-size: 36px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .navbar a {
+      text-decoration: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      padding: 15px 24px;
+      border-radius: 10px;
+      margin-left: 20px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(5px);
+      font-size: 20px;
+    }
+
+    .navbar a:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.05);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    .sos-header {
+      text-align: center;
+      color: white;
+      margin-bottom: 30px;
+    }
+
+    .sos-header h2 {
+      font-size: 48px;
+      margin-bottom: 10px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .sos-header p {
+      font-size: 22px;
+      max-width: 800px;
+      margin: 0 auto 15px;
+    }
+    
+    .training-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #ffd700, #ffa500);
+      color: #333;
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-weight: bold;
+      font-size: 16px;
+      box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+      animation: badgePulse 2s infinite;
+      margin-top: 15px;
+    }
+    
+    @keyframes badgePulse {
+      0% { transform: scale(1); box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4); }
+      50% { transform: scale(1.05); box-shadow: 0 6px 20px rgba(255, 215, 0, 0.6); }
+      100% { transform: scale(1); box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4); }
+    }
+
+    .simulator-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 30px;
+      margin: 40px 0;
+    }
+
+    .simulator-panel {
+      flex: 1;
+      min-width: 300px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: transform 0.3s ease;
+    }
+
+    .simulator-panel:hover {
+      transform: translateY(-5px);
+    }
+
+    .simulator-panel h3 {
+      color: #333;
+      margin-bottom: 20px;
+      font-size: 28px;
+      text-align: center;
+    }
+
+    .sos-button-container {
+      display: flex;
+      justify-content: center;
+      margin: 50px 0;
+    }
+
+    .sos-button {
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #ff0000, #b30000);
+      color: white;
+      font-size: 36px;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 0 50px rgba(255, 0, 0, 0.7);
+      animation: pulse 2s infinite;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .sos-button::after {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, transparent 70%);
+      transform: rotate(30deg);
+      animation: rotate 4s linear infinite;
+    }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .sos-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 70px rgba(255, 0, 0, 0.9);
+    }
+
+    .sos-button:active {
+      transform: scale(0.95);
+      box-shadow: 0 0 30px rgba(255, 0, 0, 0.5);
+    }
+
+    .sos-button::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 70%);
+      transform: rotate(30deg);
+    }
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7);
+      }
+      70% {
+        box-shadow: 0 0 0 20px rgba(255, 0, 0, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
+      }
+    }
+
+    .emergency-scenario {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 25px;
+      border-radius: 15px;
+      margin: 20px 0;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(5px);
+    }
+
+    .emergency-scenario::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: 0.5s;
+    }
+
+    .emergency-scenario:hover {
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .emergency-scenario:hover::before {
+      left: 100%;
+    }
+
+    .emergency-scenario:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    .emergency-scenario h4 {
+      margin-bottom: 10px;
+      font-size: 22px;
+    }
+
+    .emergency-scenario p {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      padding: 15px;
+      border-radius: 10px;
+      margin: 15px 0;
+      font-weight: bold;
+      animation: fadeIn 0.5s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .status-indicator::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transform: translateX(-100%);
+      transition: transform 0.5s ease;
+    }
+    
+    .status-indicator.updated::before {
+      transform: translateX(100%);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .status-pending {
+      background: rgba(255, 193, 7, 0.2);
+      color: #856404;
+      border: 1px solid #ffc107;
+    }
+
+    .status-active {
+      background: rgba(40, 167, 69, 0.2);
+      color: #155724;
+      border: 1px solid #28a745;
+    }
+
+    .status-completed {
+      background: rgba(0, 123, 255, 0.2);
+      color: #004085;
+      border: 1px solid #007bff;
+    }
+
+    .status-failed {
+      background: rgba(220, 53, 69, 0.2);
+      color: #721c24;
+      border: 1px solid #dc3545;
+    }
+
+    .status-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+
+    .dot-pending {
+      background: #ffc107;
+      animation: blink 1s infinite;
+    }
+
+    .dot-active {
+      background: #28a745;
+      animation: pulse 1.5s infinite;
+    }
+
+    .dot-completed {
+      background: #007bff;
+    }
+
+    .dot-failed {
+      background: #dc3545;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .animated-ambulance {
+      position: relative;
+      width: 100%;
+      height: 150px;
+      margin: 30px 0;
+      overflow: hidden;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+      border-radius: 15px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(5px);
+    }
+
+    .road {
+      position: absolute;
+      width: 100%;
+      height: 20px;
+      background: #333;
+      top: 90px;
+      border-top: 2px dashed #fff;
+    }
+
+    .ambulance {
+      position: absolute;
+      width: 100px;
+      height: 50px;
+      background: linear-gradient(135deg, #ff0000, #b30000);
+      border-radius: 10px;
+      top: 60px;
+      left: -150px;
+      animation: drive 6s linear infinite;
+      box-shadow: 0 8px 20px rgba(255, 0, 0, 0.4);
+      z-index: 10;
+    }
+
+    .ambulance::before {
+      content: "";
+      position: absolute;
+      width: 25px;
+      height: 25px;
+      background: #222;
+      border-radius: 50%;
+      top: 35px;
+      left: 10px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    }
+
+    .ambulance::after {
+      content: "";
+      position: absolute;
+      width: 25px;
+      height: 25px;
+      background: #222;
+      border-radius: 50%;
+      top: 35px;
+      right: 10px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    }
+
+    .ambulance-light {
+      position: absolute;
+      width: 15px;
+      height: 15px;
+      background: #00ffff;
+      border-radius: 50%;
+      top: 10px;
+      left: 10px;
+      animation: flash 0.5s infinite alternate;
+      box-shadow: 0 0 10px #00ffff;
+    }
+
+    .ambulance-light.right {
+      left: auto;
+      right: 10px;
+    }
+
+    .ambulance-light.rear {
+      left: 40px;
+      background: #ff0000;
+      box-shadow: 0 0 10px #ff0000;
+    }
+
+    .ambulance-text {
+      position: absolute;
+      top: 5px;
+      left: 30px;
+      color: white;
+      font-weight: bold;
+      font-size: 12px;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    @keyframes drive {
+      0% { left: -150px; }
+      100% { left: calc(100% + 150px); }
+    }
+
+    @keyframes flash {
+      0% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+
+    .emergency-map {
+      height: 350px;
+      border-radius: 15px;
+      margin: 20px 0;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      position: relative;
+      overflow: hidden;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(5px);
+    }
+
+    .map-grid {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+      background-size: 30px 30px;
+    }
+
+    .map-marker {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background: #ff0000;
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+      box-shadow: 0 0 15px rgba(255, 0, 0, 0.8);
+      border: 2px solid white;
+      z-index: 10;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .map-marker:hover {
+      transform: scale(1.2);
+    }
+
+    .map-marker.user {
+      background: linear-gradient(135deg, #007bff, #0056b3);
+      box-shadow: 0 0 15px rgba(0, 123, 255, 0.8);
+      left: 30%;
+      top: 40%;
+    }
+
+    .map-marker.ambulance {
+      background: linear-gradient(135deg, #28a745, #1e7e34);
+      box-shadow: 0 0 15px rgba(40, 167, 69, 0.8);
+      left: 70%;
+      top: 60%;
+      animation-delay: 1s;
+    }
+
+    .map-marker.hospital {
+      background: linear-gradient(135deg, #ffc107, #e0a800);
+      box-shadow: 0 0 15px rgba(255, 193, 7, 0.8);
+      left: 50%;
+      top: 30%;
+      animation-delay: 2s;
+    }
+
+    .map-marker.pulse {
+      animation: markerPulse 2s infinite;
+    }
+
+    .map-label {
+      position: absolute;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 16px;
+      white-space: nowrap;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(5px);
+      transform: translate(-50%, -100%);
+      margin-top: -10px;
+      z-index: 20;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .map-marker:hover + .map-label {
+      opacity: 1;
+    }
+
+    .label-user {
+      left: 35%;
+      top: 35%;
+    }
+
+    .label-ambulance {
+      left: 75%;
+      top: 55%;
+    }
+
+    .label-hospital {
+      left: 55%;
+      top: 25%;
+    }
+
+    @keyframes markerPulse {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7);
+      }
+      70% {
+        transform: scale(1.1);
+        box-shadow: 0 0 0 15px rgba(255, 0, 0, 0);
+      }
+      100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
+      }
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.5s ease;
+      backdrop-filter: blur(5px);
+    }
+
+    .modal-content {
+      background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+      border-radius: 20px;
+      padding: 30px;
+      width: 90%;
+      max-width: 700px;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+      animation: modalAppear 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+    }
+
+    @keyframes modalAppear {
+      0% {
+        transform: scale(0.7) translateY(50px);
+        opacity: 0;
+      }
+      100% {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(-50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .modal-header h3 {
+      margin: 0;
+      color: #333;
+    }
+
+    .close-modal {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #999;
+    }
+
+    .close-modal:hover {
+      color: #333;
+    }
+
+    .modal-body p {
+      margin-bottom: 15px;
+      line-height: 1.6;
+    }
+
+    .emergency-timeline {
+      margin: 20px 0;
+    }
+
+    .timeline-item {
+      display: flex;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .timeline-item:not(:last-child)::before {
+      content: "";
+      position: absolute;
+      left: 15px;
+      top: 35px;
+      width: 2px;
+      height: calc(100% + 5px);
+      background: #ddd;
+    }
+
+    .timeline-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #007bff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      margin-right: 15px;
+      flex-shrink: 0;
+    }
+
+    .timeline-content {
+      flex: 1;
+    }
+
+    .timeline-content h4 {
+      margin: 0 0 5px 0;
+      color: #333;
+    }
+
+    .timeline-content p {
+      margin: 0;
+      color: #666;
+      font-size: 14px;
+    }
+
+    .emergency-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: bold;
+      color: #ff416c;
+      margin-bottom: 5px;
+    }
+
+    .stat-label {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .action-btn {
+      flex: 1;
+      min-width: 120px;
+      padding: 12px 20px;
+      border-radius: 8px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .primary-btn {
+      background: linear-gradient(135deg, #ff416c, #ff4b2b);
+      color: white;
+    }
+
+    .secondary-btn {
+      background: rgba(255, 255, 255, 0.9);
+      color: #333;
+      border: 1px solid #ddd;
+    }
+
+    .action-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Simulation Progress */
+    .simulation-progress-container {
+      margin: 20px 0;
+    }
+    
+    .simulation-progress-bar {
+      width: 100%;
+      height: 20px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+    
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ff416c, #ff4b2b);
+      border-radius: 10px;
+      transition: width 0.5s ease;
+      box-shadow: 0 0 10px rgba(255, 65, 108, 0.5);
+    }
+    
+    .progress-label {
+      text-align: center;
+      margin-top: 10px;
+      font-weight: bold;
+      color: white;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+    
+    .training-level {
+      text-align: center;
+      font-weight: bold;
+      color: #ffd700;
+      font-size: 20px;
+      margin-bottom: 10px;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    }
+    
+    .xp-points {
+      text-align: center;
+      font-weight: bold;
+      color: #00ffff;
+      margin-top: 10px;
+      font-size: 18px;
+      text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+    }
+    
+    /* Notification System */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      z-index: 2000;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+      border-left: 5px solid #ff416c;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      max-width: 350px;
+    }
+    
+    .notification-content h4 {
+      margin: 0 0 10px 0;
+      color: #333;
+      font-size: 18px;
+    }
+    
+    .notification-content p {
+      margin: 0;
+      color: #666;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    @media (max-width: 768px) {
+      .sos-button {
+        width: 250px;
+        height: 250px;
+        font-size: 28px;
+      }
+      
+      .navbar {
+        padding: 15px 5%;
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .navbar a {
+        margin: 10px 5px;
+        padding: 10px 15px;
+        font-size: 16px;
+      }
+      
+      .simulator-container {
+        flex-direction: column;
+      }
+    }
+
+    .dark-mode .navbar {
+      background: rgba(0, 0, 0, 0.4);
+    }
+
+    .dark-mode .navbar a {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff !important;
+    }
+
+    .dark-mode .navbar a:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .dark-mode .container {
+      color: #ffffff;
+    }
+
+    .dark-mode .sos-header h2 {
+      color: #ffffff !important;
+    }
+
+    .dark-mode .sos-header p {
+      color: #ffffff !important;
+    }
+
+    .dark-mode .simulator-panel {
+      background: rgba(30, 30, 46, 0.9);
+      color: #ffffff;
+    }
+
+    .dark-mode .simulator-panel h3 {
+      color: #ffffff !important;
+    }
+
+    .dark-mode .emergency-scenario {
+      background: rgba(50, 50, 70, 0.9);
+    }
+
+    .dark-mode .status-message {
+      color: #ffffff !important;
+    }
+
+    /* Dark mode dropdown menu styles */
+    .dark-mode .dropdown-content {
+      background-color: #1e1e1e !important;
+      color: #ffffff !important;
+    }
+
+    .dark-mode .dropdown-content a {
+      color: #ffffff !important;
+      background-color: #1e1e1e !important;
+    }
+
+    .dark-mode .dropdown-content a:hover {
+      background-color: #333333 !important;
+      color: #ffeb3b !important;
+    }
+
+    .dark-mode .dropdown-btn {
+      background: rgba(255, 255, 255, 0.1) !important;
+      color: #ffffff !important;
+      border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+  </style>
+</head>
+<body>
+  <!-- Bubbles Container -->
+  <div class="bubbles">
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+  </div>
+  
+  <div class="navbar">
+    <h1> 🚑 ResQNow Emergency Simulator </h1>
+    <div>
+      <a href="index.html">Home</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="sos-header">
+      <h2>🎮 Interactive Emergency Training Simulator</h2>
+      <p>Experience our cutting-edge emergency response training platform. Practice real-world scenarios and learn life-saving protocols.</p>
+      <div class="training-badge">CERTIFIED TRAINING MODULE</div>
+    </div>
+    
+    <div class="sos-button-container">
+      <button class="sos-button" id="sosButton" onclick="triggerSimulation()">
+        <span>🎓 START TRAINING</span>
+        <span style="font-size: 18px; margin-top: 10px;">EMERGENCY SIMULATION</span>
+      </button>
+    </div>
+    
+    <div class="simulator-container">
+      <div class="simulator-panel">
+        <h3>Emergency Scenarios</h3>
+        <div class="emergency-scenario" onclick="openScenarioModal('cardiac')">
+          <h4>❤️ Cardiac Arrest</h4>
+          <p>Simulate a cardiac emergency with immediate response protocols</p>
+        </div>
+        <div class="emergency-scenario" onclick="openScenarioModal('accident')">
+          <h4>🚗 Road Accident</h4>
+          <p>Experience trauma response for vehicle collision incidents</p>
+        </div>
+        <div class="emergency-scenario" onclick="openScenarioModal('stroke')">
+          <h4>🧠 Stroke</h4>
+          <p>Simulate neurological emergency with time-sensitive treatment</p>
+        </div>
+        <div class="emergency-scenario" onclick="openScenarioModal('childbirth')">
+          <h4>👶 Childbirth Emergency</h4>
+          <p>Experience emergency labor and delivery response protocols</p>
+        </div>
+        
+        <div class="animated-ambulance">
+          <div class="road"></div>
+          <div class="ambulance">
+            <div class="ambulance-light"></div>
+            <div class="ambulance-light right"></div>
+            <div class="ambulance-light rear"></div>
+            <div class="ambulance-text">AMBULANCE</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="simulator-panel">
+        <h3>Live Simulation</h3>
+        <div class="status-indicator status-pending">
+          <div class="status-dot dot-pending"></div>
+          <span>Training Ready - Click START to begin</span>
+        </div>
+        
+        <div class="emergency-map">
+          <div class="map-grid"></div>
+          <div class="map-marker user pulse"></div>
+          <div class="map-marker ambulance pulse"></div>
+          <div class="map-marker hospital pulse"></div>
+          <div class="map-label label-user">Your Location</div>
+          <div class="map-label label-ambulance">Ambulance</div>
+          <div class="map-label label-hospital">Hospital</div>
+        </div>
+        
+        <div class="simulation-progress-container">
+          <div class="training-level">Level 1: Basic Emergency Response</div>
+          <div class="simulation-progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+          <div class="progress-label" id="progressLabel">Ready to start training</div>
+          <div class="xp-points">XP: <span id="xpPoints">0</span>/100</div>
+        </div>
+        
+        <div class="emergency-stats">
+          <div class="stat-card">
+            <div class="stat-value" id="responseTime">0s</div>
+            <div class="stat-label">Response Time</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="distance">0km</div>
+            <div class="stat-label">Distance</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="eta">0min</div>
+            <div class="stat-label">ETA</div>
+          </div>
+        </div>
+        
+        <div class="action-buttons">
+          <button class="action-btn primary-btn" onclick="triggerSimulation()">🎓 Begin Training</button>
+          <button class="action-btn secondary-btn" onclick="resetSimulation()">🔄 Reset Training</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Scenario Modal -->
+  <div class="modal" id="scenarioModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modalTitle">Emergency Scenario</h3>
+        <button class="close-modal" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <!-- Content will be populated by JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let simulationActive = false;
+    let responseTime = 0;
+    let xpPoints = 0;
+    let interval;
+    
+    // Trigger simulation
+    function triggerSimulation() {
+      if (simulationActive) return;
+      
+      simulationActive = true;
+      const sosButton = document.getElementById('sosButton');
+      sosButton.disabled = true;
+      sosButton.innerHTML = '<span>🎓 TRAINING IN PROGRESS</span><span style="font-size: 18px; margin-top: 10px;">...</span>';
+      
+      // Reset progress
+      updateProgress(0, 'Simulation started');
+      
+      // Update status
+      updateStatusIndicator('status-active', 'Simulation Active - Emergency dispatched');
+      
+      // Start counters
+      responseTime = 0;
+      interval = setInterval(updateCounters, 100);
+      
+      // Simulate emergency sequence with real-time updates
+      setTimeout(() => {
+        updateStatusIndicator('status-pending', 'Locating nearest ambulance...');
+        updateProgress(10, 'Locating ambulance');
+      }, 1000);
+      
+      setTimeout(() => {
+        updateStatusIndicator('status-active', 'Ambulance dispatched - ETA: 8 minutes');
+        updateProgress(20, 'Ambulance dispatched');
+      }, 2000);
+      
+      setTimeout(() => {
+        updateStatusIndicator('status-active', 'Ambulance en route - Current location: Sector 15');
+        updateProgress(40, 'Ambulance en route');
+      }, 4000);
+      
+      setTimeout(() => {
+        updateStatusIndicator('status-active', 'Ambulance approaching - 2 minutes away');
+        updateProgress(60, 'Approaching destination');
+      }, 6000);
+      
+      setTimeout(() => {
+        updateStatusIndicator('status-active', 'Ambulance arrived at your location');
+        updateProgress(80, 'Arrived at location');
+      }, 8000);
+      
+      setTimeout(() => {
+        updateStatusIndicator('status-completed', 'Simulation Complete - Emergency response finished');
+        updateProgress(100, 'Simulation completed');
+        clearInterval(interval);
+        simulationActive = false;
+        sosButton.disabled = false;
+        sosButton.innerHTML = '<span>🔄 RETRAIN</span><span style="font-size: 18px; margin-top: 10px;">EMERGENCY SCENARIO</span>';
+      }, 10000);
+    }
+    
+    // Update progress bar
+    function updateProgress(percentage, label) {
+      const progressFill = document.getElementById('progressFill');
+      const progressLabel = document.getElementById('progressLabel');
+      const xpPointsElement = document.getElementById('xpPoints');
+      
+      progressFill.style.width = percentage + '%';
+      progressLabel.textContent = label;
+      
+      // Update XP points based on progress
+      xpPoints = Math.min(100, Math.floor(percentage));
+      if (xpPointsElement) {
+        xpPointsElement.textContent = xpPoints;
+      }
+      
+      // Add animation effect
+      progressFill.style.boxShadow = '0 0 15px rgba(255, 65, 108, 0.8)';
+      setTimeout(() => {
+        progressFill.style.boxShadow = '0 0 10px rgba(255, 65, 108, 0.5)';
+      }, 500);
+    }
+    
+    // Update status indicator with animation
+    function updateStatusIndicator(statusClass, message) {
+      const statusIndicator = document.querySelector('.status-indicator');
+      statusIndicator.className = 'status-indicator ' + statusClass;
+      
+      // Add visual feedback
+      statusIndicator.classList.add('updated');
+      setTimeout(() => {
+        statusIndicator.classList.remove('updated');
+      }, 500);
+      
+      // Update content based on status
+      let dotClass = '';
+      if (statusClass.includes('pending')) {
+        dotClass = 'dot-pending';
+      } else if (statusClass.includes('active')) {
+        dotClass = 'dot-active';
+      } else if (statusClass.includes('completed')) {
+        dotClass = 'dot-completed';
+      } else if (statusClass.includes('failed')) {
+        dotClass = 'dot-failed';
+      }
+      
+      statusIndicator.innerHTML = `<div class="status-dot ${dotClass}"></div><span>${message}</span>`;
+    }
+    
+    // Update counters during simulation
+    function updateCounters() {
+      responseTime += 0.1;
+      document.getElementById('responseTime').textContent = responseTime.toFixed(1) + 's';
+      
+      // Calculate simulated values
+      const distance = Math.max(0, 10 - (responseTime * 0.5)).toFixed(1);
+      const eta = Math.max(0, 8 - (responseTime * 0.4)).toFixed(1);
+      
+      document.getElementById('distance').textContent = distance + 'km';
+      document.getElementById('eta').textContent = eta + 'min';
+    }
+    
+    // Reset simulation
+    function resetSimulation() {
+      clearInterval(interval);
+      simulationActive = false;
+      xpPoints = 0;
+      
+      const sosButton = document.getElementById('sosButton');
+      sosButton.disabled = false;
+      sosButton.innerHTML = '<span>🎓 START TRAINING</span><span style="font-size: 18px; margin-top: 10px;">EMERGENCY SIMULATION</span>';
+      
+      // Reset counters
+      responseTime = 0;
+      document.getElementById('responseTime').textContent = '0s';
+      document.getElementById('distance').textContent = '0km';
+      document.getElementById('eta').textContent = '0min';
+      
+      // Reset status
+      document.querySelector('.status-indicator').className = 'status-indicator status-pending';
+      document.querySelector('.status-indicator').innerHTML = '<div class="status-dot dot-pending"></div><span>Training Ready - Click START to begin</span>';
+      
+      // Reset progress bar and XP
+      updateProgress(0, 'Ready to start training');
+      
+      // Reset XP display
+      const xpPointsElement = document.getElementById('xpPoints');
+      if (xpPointsElement) {
+        xpPointsElement.textContent = '0';
+      }
+    }
+    
+    // Open scenario modal
+    function openScenarioModal(scenario) {
+      const modal = document.getElementById('scenarioModal');
+      const title = document.getElementById('modalTitle');
+      const body = document.getElementById('modalBody');
+      
+      // Add opening animation class
+      modal.classList.add('modal-opening');
+      
+      switch(scenario) {
+        case 'cardiac':
+          title.textContent = '❤️ Cardiac Arrest Simulation';
+          body.innerHTML = `
+            <p><strong>Scenario:</strong> Cardiac arrest is a sudden loss of blood flow resulting from the failure of the heart to pump effectively.</p>
+            
+            <div class="emergency-timeline">
+              <div class="timeline-item">
+                <div class="timeline-icon">1</div>
+                <div class="timeline-content">
+                  <h4>Emergency Call</h4>
+                  <p>User presses SOS button. System immediately dispatches nearest ambulance.</p>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-icon">2</div>
+                <div class="timeline-content">
+                  <h4>Location Detection</h4>
+                  <p>GPS coordinates captured with high accuracy. Nearest hospital identified.</p>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-icon">3</div>
+                <div class="timeline-content">
+                  <h4>Ambulance Dispatch</h4>
+                  <p>Cardiac specialist ambulance dispatched with defibrillator and medications.</p>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-icon">4</div>
+                <div class="timeline-content">
+                  <h4>Pre-Arrival Instructions</h4>
+                  <p>Medical guidance provided to user for CPR until ambulance arrival.</p>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-icon">5</div>
+                <div class="timeline-content">
+                  <h4>Hospital Notification</h4>
+                  <p>Receiving hospital alerted with patient details and ETA for preparation.</p>
+                </div>
+              </div>
+            </div>
+            
+            <p><strong>Response Time:</strong> Critical - First 4 minutes are crucial for survival.</p>
+            <p><strong>Special Equipment:</strong> Defibrillator, cardiac medications, oxygen therapy.</p>
+          `;
+          break;
+          
+        case 'accident':
+          title.textContent = '🚗 Road Accident Simulation';
+          body.innerHTML = `
+            <p><strong>Scenario:</strong> Vehicle collision with potential for severe trauma injuries.</p>
+            
+            <div class="emergency-timeline">
+              <div class="timeline-item">
+                <div class="timeline-icon">1</div>
+                <div class="timeline-content">
+                  <h4>Emergency Call</h4>
+                  <p>User activates SOS. System simultaneously alerts police and fire department.</p>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-icon">2</div>
+                <div class="timeline-content">
+                  <h4>Scene Assessment</h4>
+                  <p>Dispatch team includes trauma specialists and extrication equipment.</p>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-icon">3</div>
+                <div class="timeline-content">
+                  <h4>Resource Coordination</h4>
+                  <p>Multiple units dispatched: ambulance, fire truck, police patrol car.</p>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-icon">4</div>
+                <div class="timeline-content">
+                  <h4>On-Scene Care</h4>
+                  <p>Spinal precautions, bleeding control, and airway management initiated.</p>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-icon">5</div>
+                <div class="timeline-content">
+                  <h4>Trauma Center Alert</h4>
+                  <p>Level 1 trauma center notified with injury severity assessment.</p>
+                </div>
+              </div>
+            </div>
+            
+            <p><strong>Response Time:</strong> Critical - Golden hour for trauma survival.</p>
+            <p><strong>Special Equipment:</strong> Extrication tools, spinal immobilization, trauma supplies.</p>
+          `;
+          break;
+          
+        case 'stroke':
+          title.textContent = '🧠 Stroke Simulation';
+          body.innerHTML = `
+            <p><strong>Scenario:</strong> Sudden onset of neurological deficit requiring immediate intervention.</p>
+            
+            <div class="emergency-timeline">
+              <div class="timeline-item">
+                <div class="timeline-icon">1</div>
+                <div class="timeline-content">
+                  <h4>Emergency Call</h4>
+                  <p>User activates SOS. Stroke protocol immediately initiated.</p>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-icon">2</div>
+                <div class="timeline-content">
+                  <h4>Stroke Assessment</h4>
+                  <p>Paramedics conduct FAST assessment (Face, Arms, Speech, Time).</p>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-icon">3</div>
+                <div class="timeline-content">
+                  <h4>Specialized Dispatch</h4>
+                  <p>Stroke-ready ambulance dispatched with CT scanner notification.</p>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-icon">4</div>
+                <div class="timeline-content">
+                  <h4>Pre-Hospital Care</h4>
+                  <p>Blood pressure management and glucose monitoring initiated.</p>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-icon">5</div>
+                <div class="timeline-content">
+                  <h4>Thrombolytic Alert</h4>
+                  <p>Stroke center prepared for potential thrombolytic therapy.</p>
+                </div>
+              </div>
+            </div>
+            
+            <p><strong>Response Time:</strong> Critical - Window for clot-busting drugs is 4.5 hours.</p>
+            <p><strong>Special Equipment:</strong> Blood glucose monitor, neurological assessment tools.</p>
+          `;
+          break;
+          
+        case 'childbirth':
+          title.textContent = '👶 Childbirth Emergency Simulation';
+          body.innerHTML = `
+            <p><strong>Scenario:</strong> Emergency labor requiring immediate obstetric care.</p>
+            
+            <div class="emergency-timeline">
+              <div class="timeline-item">
+                <div class="timeline-icon">1</div>
+                <div class="timeline-content">
+                  <h4>Emergency Call</h4>
+                  <p>User activates SOS. Obstetric emergency protocol initiated.</p>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-icon">2</div>
+                <div class="timeline-content">
+                  <h4>Specialist Dispatch</h4>
+                  <p>Obstetric-trained paramedics and pediatric equipment dispatched.</p>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-icon">3</div>
+                <div class="timeline-content">
+                  <h4>Delivery Preparation</h4>
+                  <p>Emergency delivery kit and neonatal resuscitation equipment prepared.</p>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-icon">4</div>
+                <div class="timeline-content">
+                  <h4>On-Route Care</h4>
+                  <p>Continuous fetal monitoring and maternal vital signs assessed.</p>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-icon">5</div>
+                <div class="timeline-content">
+                  <h4>Maternity Hospital Alert</h4>
+                  <p>Neonatal intensive care unit and obstetric team notified.</p>
+                </div>
+              </div>
+            </div>
+            
+            <p><strong>Response Time:</strong> Critical - Immediate delivery may be required en route.</p>
+            <p><strong>Special Equipment:</strong> Obstetric kit, neonatal resuscitation equipment.</p>
+          `;
+          break;
+      }
+      
+      // Show modal with animation
+      modal.style.display = 'flex';
+      
+      // Remove opening class after animation completes
+      setTimeout(() => {
+        modal.classList.remove('modal-opening');
+      }, 500);
+    }
+    
+    // Close modal
+    function closeModal() {
+      document.getElementById('scenarioModal').style.display = 'none';
+    }
+    
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      const modal = document.getElementById('scenarioModal');
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
+    }
+    
+    // Logout function
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('userName');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('loggedIn');
+      window.location.href = 'index.html';
+    }
+    
+    // Add interactive map markers
+    function initMapInteractions() {
+      const markers = document.querySelectorAll('.map-marker');
+      markers.forEach(marker => {
+        marker.addEventListener('click', function() {
+          // Add a visual effect when clicked
+          this.classList.add('pulse');
+          setTimeout(() => {
+            this.classList.remove('pulse');
+          }, 2000);
+          
+          // Show information based on marker type
+          const markerClass = this.className;
+          if (markerClass.includes('user')) {
+            showNotification('📍 Your Location', 'The system has detected your position for emergency response.');
+          } else if (markerClass.includes('ambulance')) {
+            showNotification('🚑 Nearest Ambulance', 'Currently en route to your location with an ETA of 8 minutes.');
+          } else if (markerClass.includes('hospital')) {
+            showNotification('🏥 Nearest Hospital', 'Has been notified and is preparing for your arrival.');
+          }
+        });
+      });
+    }
+    
+    // Add emergency pulse effect to scenarios
+    function initScenarioInteractions() {
+      const scenarios = document.querySelectorAll('.emergency-scenario');
+      scenarios.forEach(scenario => {
+        scenario.addEventListener('mouseenter', function() {
+          this.style.animation = 'pulse 1s infinite';
+        });
+        
+        scenario.addEventListener('mouseleave', function() {
+          this.style.animation = '';
+        });
+        
+        scenario.addEventListener('click', function() {
+          // Add visual feedback
+          this.style.transform = 'scale(0.98)';
+          setTimeout(() => {
+            this.style.transform = '';
+          }, 100);
+        });
+      });
+    }
+    
+    // Show notification with animation
+    function showNotification(title, message) {
+      // Create notification element
+      const notification = document.createElement('div');
+      notification.className = 'notification';
+      notification.innerHTML = `
+        <div class="notification-content">
+          <h4>${title}</h4>
+          <p>${message}</p>
+        </div>
+      `;
+      
+      // Add to body
+      document.body.appendChild(notification);
+      
+      // Trigger animation
+      setTimeout(() => {
+        notification.style.opacity = '1';
+        notification.style.transform = 'translateY(0)';
+      }, 10);
+      
+      // Remove after delay
+      setTimeout(() => {
+        notification.style.opacity = '0';
+        notification.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+          document.body.removeChild(notification);
+        }, 300);
+      }, 3000);
+    }
+    
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      initMapInteractions();
+      initScenarioInteractions();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>First Aid Guide | ResQNow</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+      color: #222;
+      animation: gradientBG 15s ease infinite;
+      background-size: 400% 400%;
+      min-height: 100vh;
+      position: relative;
+      overflow-y: auto;
+      font-size: 18px;
+    }
+    
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    /* Bubbles animation */
+    .bubbles {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+      top: 0;
+      left: 0;
+    }
+    
+    .bubble {
+      position: absolute;
+      bottom: -100px;
+      width: 80px;
+      height: 80px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      opacity: 0.5;
+      animation: rise 10s infinite ease-in;
+    }
+    
+    .bubble:nth-child(1) {
+      width: 80px;
+      height: 80px;
+      left: 10%;
+      animation-duration: 8s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(2) {
+      width: 60px;
+      height: 60px;
+      left: 20%;
+      animation-duration: 5s;
+      animation-delay: 1s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(3) {
+      width: 100px;
+      height: 100px;
+      left: 35%;
+      animation-duration: 7s;
+      animation-delay: 2s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(4) {
+      width: 150px;
+      height: 150px;
+      left: 50%;
+      animation-duration: 11s;
+      animation-delay: 0s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(5) {
+      width: 70px;
+      height: 70px;
+      left: 55%;
+      animation-duration: 6s;
+      animation-delay: 1s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(6) {
+      width: 90px;
+      height: 90px;
+      left: 65%;
+      animation-duration: 8s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(7) {
+      width: 70px;
+      height: 70px;
+      left: 75%;
+      animation-duration: 7s;
+      animation-delay: 3s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(8) {
+      width: 130px;
+      height: 130px;
+      left: 80%;
+      animation-duration: 12s;
+      animation-delay: 2s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(9) {
+      width: 50px;
+      height: 50px;
+      left: 70%;
+      animation-duration: 5s;
+      animation-delay: 1s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .bubble:nth-child(10) {
+      width: 100px;
+      height: 100px;
+      left: 85%;
+      animation-duration: 9s;
+      animation-delay: 4s;
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    @keyframes rise {
+      0% {
+        bottom: -100px;
+        transform: translateX(0);
+      }
+      50% {
+        transform: translateX(100px);
+      }
+      100% {
+        bottom: 1080px;
+        transform: translateX(-200px);
+      }
+    }
+
+    .navbar {
+      background: rgba(0, 0, 0, 0.2);
+      padding: 25px 12%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      position: relative;
+      z-index: 100;
+    }
+
+    .navbar h1 {
+      color: #fff;
+      font-size: 36px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .navbar a {
+      text-decoration: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      padding: 15px 24px;
+      border-radius: 10px;
+      margin-left: 20px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(5px);
+      font-size: 20px;
+    }
+
+    .navbar a:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.05);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    .guide-header {
+      text-align: center;
+      color: white;
+      margin-bottom: 30px;
+    }
+
+    .guide-header h2 {
+      font-size: 48px;
+      margin-bottom: 10px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .guide-header p {
+      font-size: 22px;
+      max-width: 800px;
+      margin: 0 auto 15px;
+    }
+    
+    .certified-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #ff758c, #ff7eb3);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-weight: bold;
+      font-size: 16px;
+      box-shadow: 0 4px 15px rgba(255, 117, 140, 0.4);
+      animation: badgePulse 2s infinite;
+      margin-top: 15px;
+    }
+    
+    @keyframes badgePulse {
+      0% { transform: scale(1); box-shadow: 0 4px 15px rgba(255, 117, 140, 0.4); }
+      50% { transform: scale(1.05); box-shadow: 0 6px 20px rgba(255, 117, 140, 0.6); }
+      100% { transform: scale(1); box-shadow: 0 4px 15px rgba(255, 117, 140, 0.4); }
+    }
+
+    .first-aid-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 30px;
+      margin: 40px 0;
+    }
+
+    .aid-card {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .aid-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .aid-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: linear-gradient(90deg, #ff758c, #ff7eb3);
+    }
+
+    .aid-card h3 {
+      color: #333;
+      margin-bottom: 20px;
+      font-size: 28px;
+      display: flex;
+      align-items: center;
+    }
+
+    .aid-card h3 i {
+      margin-right: 15px;
+      font-size: 32px;
+    }
+
+    .steps {
+      list-style-type: none;
+      padding: 0;
+      counter-reset: step-counter;
+    }
+
+    .steps li {
+      margin-bottom: 20px;
+      padding-left: 50px;
+      position: relative;
+      line-height: 1.6;
+      border-left: 2px solid #ff758c;
+      padding-left: 20px;
+      margin-left: 15px;
+    }
+
+    .steps li::before {
+      counter-increment: step-counter;
+      content: counter(step-counter);
+      position: absolute;
+      left: -12px;
+      top: 0;
+      background: #ff758c;
+      color: white;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .warning {
+      background: rgba(255, 117, 140, 0.1);
+      border-left: 4px solid #ff758c;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 0 8px 8px 0;
+    }
+
+    .warning h4 {
+      color: #ff758c;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+    }
+
+    .warning h4 i {
+      margin-right: 10px;
+      font-size: 20px;
+    }
+
+    .emergency-number {
+      text-align: center;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 20px;
+      margin: 40px 0;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .emergency-number h3 {
+      font-size: 32px;
+      margin-bottom: 20px;
+    }
+
+    .emergency-number p {
+      font-size: 24px;
+      font-weight: bold;
+      margin: 20px 0;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #ff758c, #ff7eb3);
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 50px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(255, 117, 140, 0.4);
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(255, 117, 140, 0.6);
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 15px 5%;
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .navbar a {
+        margin: 10px 5px;
+        padding: 10px 15px;
+        font-size: 16px;
+      }
+      
+      .first-aid-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Bubbles Container -->
+  <div class="bubbles">
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+  </div>
+  
+  <div class="navbar">
+    <h1> 🩹 ResQNow First Aid Guide </h1>
+    <div>
+      <a href="index.html">Home</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="guide-header">
+      <h2>🩹 Comprehensive First Aid Guide</h2>
+      <p>Learn essential first aid techniques to respond effectively in emergency situations and potentially save lives.</p>
+      <div class="certified-badge">CERTIFIED FIRST AID INSTRUCTIONS</div>
+    </div>
+    
+    <div class="emergency-number">
+      <h3>🚑 Emergency Contact</h3>
+      <p>In any serious emergency, always call your local emergency number first:</p>
+      <p>📞 1800-234-001</p>
+      <button class="btn" onclick="callEmergency()">Call Emergency Services</button>
+    </div>
+    
+    <div class="first-aid-grid">
+      <div class="aid-card">
+        <h3>❤️ CPR (Cardiopulmonary Resuscitation)</h3>
+        <ol class="steps">
+          <li>Check for responsiveness by tapping and shouting</li>
+          <li>Call emergency services or ask someone else to call</li>
+          <li>Position the person on their back on a firm surface</li>
+          <li>Place the heel of one hand on the center of the chest, place the other hand on top</li>
+          <li>Push hard and fast at least 2 inches deep at a rate of 100-120 compressions per minute</li>
+          <li>Give 2 rescue breaths after every 30 compressions if trained</li>
+          <li>Continue until help arrives or the person starts breathing normally</li>
+        </ol>
+        <div class="warning">
+          <h4>⚠️ Important</h4>
+          <p>Only give rescue breaths if you are trained. Hands-only CPR is effective for untrained bystanders.</p>
+        </div>
+      </div>
+      
+      <div class="aid-card">
+        <h3>🔄 Choking</h3>
+        <ol class="steps">
+          <li>Determine if the person can speak, cough, or breathe</li>
+          <li>If they cannot, ask for help and call emergency services</li>
+          <li>Stand behind the person and wrap your arms around their waist</li>
+          <li>Make a fist with one hand and place it just above the navel</li>
+          <li>Grasp your fist with the other hand and give quick, upward thrusts</li>
+          <li>Repeat until the object is expelled or the person becomes unconscious</li>
+          <li>If unconscious, begin CPR and check the mouth for visible objects</li>
+        </ol>
+        <div class="warning">
+          <h4>⚠️ Important</h4>
+          <p>Do not perform the Heimlich maneuver if the person can still cough, speak, or breathe.</p>
+        </div>
+      </div>
+      
+      <div class="aid-card">
+        <h3>🩸 Severe Bleeding</h3>
+        <ol class="steps">
+          <li>Call emergency services immediately</li>
+          <li>Have the person lie down and elevate the bleeding area if possible</li>
+          <li>Wear gloves if available to protect yourself</li>
+          <li>Apply direct pressure to the wound with a clean cloth or bandage</li>
+          <li>If blood soaks through, add another cloth on top without removing the first</li>
+          <li>Maintain pressure until help arrives</li>
+          <li>If bleeding is from an arm or leg and uncontrollable, apply pressure to the artery</li>
+        </ol>
+        <div class="warning">
+          <h4>⚠️ Important</h4>
+          <p>Do not remove deeply embedded objects. Apply pressure around the object instead.</p>
+        </div>
+      </div>
+      
+      <div class="aid-card">
+        <h3>🔥 Burns</h3>
+        <ol class="steps">
+          <li>Remove the person from the source of the burn</li>
+          <li>Cool the burn with cool (not cold) running water for at least 10 minutes</li>
+          <li>Remove any jewelry or tight clothing near the burn before swelling occurs</li>
+          <li>Cover the burn with a clean, dry cloth or sterile bandage</li>
+          <li>Elevate the burned area above the heart if possible</li>
+          <li>Give pain relief medication if the person is conscious and able to swallow</li>
+        </ol>
+        <div class="warning">
+          <h4>⚠️ Important</h4>
+          <p>Never apply ice, butter, or ointments to burns. Do not break blisters that form.</p>
+        </div>
+      </div>
+      
+      <div class="aid-card">
+        <h3>🦴 Fractures</h3>
+        <ol class="steps">
+          <li>Call emergency services for serious fractures</li>
+          <li>Stop any bleeding by applying pressure with a clean cloth</li>
+          <li>Immobilize the injured area using splints or slings if available</li>
+          <li>Do not attempt to realign the bone or push protruding bones back in</li>
+          <li>Apply ice wrapped in a cloth to reduce swelling and pain</li>
+          <li>Monitor for signs of shock and treat accordingly</li>
+        </ol>
+        <div class="warning">
+          <h4>⚠️ Important</h4>
+          <p>Never move a person with a suspected spinal injury. Wait for professional help.</p>
+        </div>
+      </div>
+      
+      <div class="aid-card">
+        <h3>😵 Fainting</h3>
+        <ol class="steps">
+          <li>Loosen tight clothing, especially around the neck</li>
+          <li>Lay the person down and elevate their legs above heart level</li>
+          <li>Check breathing and pulse</li>
+          <li>Ensure fresh air circulation</li>
+          <li>Splash cool water on the face or gently fan the person</li>
+          <li>When conscious, give small sips of water</li>
+          <li>Do not let the person stand up quickly</li>
+        </ol>
+        <div class="warning">
+          <h4>⚠️ Important</h4>
+          <p>If the person does not regain consciousness within 1-2 minutes, call emergency services.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Add pulse animation to aid cards
+    document.addEventListener('DOMContentLoaded', function() {
+      const aidCards = document.querySelectorAll('.aid-card');
+      
+      aidCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+          this.style.animation = 'pulse 2s infinite';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+          this.style.animation = '';
+        });
+      });
+      
+      // Add CSS for pulse animation
+      const style = document.createElement('style');
+      style.innerHTML = `
+        @keyframes pulse {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.02); }
+          100% { transform: scale(1); }
+        }
+      `;
+      document.head.appendChild(style);
+    });
+    
+    // Call emergency function
+    function callEmergency() {
+      alert('📞 Calling 1800-234-001... (This would initiate a phone call in a real application)');
+      // In a real app: window.location.href = 'tel:1800-234-001';
+    }
+    
+    // Logout function
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('userName');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('loggedIn');
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>
